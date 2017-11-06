@@ -3,6 +3,8 @@ import logo from './logo.svg';
 import './App.css';
 var firebase;
 var db;
+var guests = [];
+var listitems;
 class App extends Component {
     constructor(props) {
         super(props);
@@ -13,7 +15,7 @@ class App extends Component {
 
 
         firebase = require("firebase");
-        const firebaseui = require('firebaseui');
+        var firebaseui = require('firebaseui');
         require("firebase/firestore");
 
         // Initialize Firebase
@@ -28,6 +30,30 @@ class App extends Component {
         firebase.initializeApp(config);
 
         db = firebase.firestore();
+
+        db.collection("guests").onSnapshot(function(querySnapshot) {
+                querySnapshot.forEach(function(doc) {
+                    guests.push(doc.data().name);
+                });
+            listitems = guests.map((guests) =>
+                <li>{guests}</li>
+            );
+                console.log("Current guest list: ", guests.join(", "));
+            });
+
+        var uiConfig = {
+            signInSuccessUrl: '<url-to-redirect-to-on-success>',
+            signInOptions: [
+                // Leave the lines as is for the providers you want to offer your users.
+                firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                firebase.auth.EmailAuthProvider.PROVIDER_ID
+            ]
+        };
+
+        // Initialize the FirebaseUI Widget using Firebase.
+        var ui = new firebaseui.auth.AuthUI(firebase.auth());
+        // The start method will wait until the DOM is loaded.
+        ui.start('#firebaseui-auth-container', uiConfig);
     }
 
     handleChange(event) {
@@ -37,7 +63,7 @@ class App extends Component {
     handleSubmit(event) {
         console.log( this.state);
 
-        db.collection("guests").doc(this.state.gender).add({
+        db.collection("guests").add({
             name: this.state.value
         })
             .then(function(docRef) {
@@ -54,8 +80,7 @@ class App extends Component {
         return (
         <div className="App">
           <header className="App-header">
-            <img src={logo} className="App-logo" alt="logo" />
-            <h1 className="App-title">Welcome to React</h1>
+              <div id="firebaseui-auth-container"></div>
           </header>
           <p className="App-intro">
             To get started, edit <code>src/App.js</code> and save to reload.
@@ -65,9 +90,11 @@ class App extends Component {
                     Guest:
                     <input type="text" value={this.state.value} onChange={this.handleChange} />
                 </label>
-                <input type="submit" value={this.state.gender = "males"} />
+                <input type="submit" value="Add Guest" />
 
             </form>
+
+            <ul>{listitems}</ul>
         </div>
       );
     }
