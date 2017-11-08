@@ -3,10 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "bootstrap": "^3.3.7",
     "firebase": "^4.6.1",
     "firebaseui": "^2.4.1",
+    "moment": "^2.19.1",
     "react": "^16.0.0",
+    "react-datepicker": "^0.60.2",
     "react-dom": "^16.0.0",
+    "react-router-dom": "^4.2.2",
     "react-scripts": "1.0.17"
   },
   "scripts": {
