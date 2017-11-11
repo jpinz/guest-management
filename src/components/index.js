@@ -5,10 +5,12 @@ import Login from './Login'
 import Register from './Register'
 import Home from './Home'
 import Parties from './protected/Parties'
+import Dashboard from './protected/Dashboard'
 import { logout } from '../helpers/auth'
 import { firebaseAuth } from '../config/constants'
 import AccountManager from "./protected/AccountManager";
 import CreateParty from "./protected/CreateParty";
+import Party from "./protected/Party";
 
 function PrivateRoute ({component: Component, authed, ...rest}) {
   return (
@@ -27,7 +29,7 @@ function PublicRoute ({component: Component, authed, ...rest}) {
       {...rest}
       render={(props) => authed === false
         ? <Component {...props} />
-        : <Redirect to='/parties' />}
+        : <Redirect to='/dashboard' />}
     />
   )
 }
@@ -62,18 +64,17 @@ export default class App extends Component {
           <nav className="navbar navbar-default navbar-static-top">
             <div className="container">
               <div className="navbar-header">
-                <Link to="/" className="navbar-brand">TKE ZM Parties List</Link>
+                <Link to="/" className="navbar-brand">TKE ZM</Link>
               </div>
               <ul className="nav navbar-nav pull-right">
                 <li>
                   <Link to="/" className="navbar-brand">Home</Link>
                 </li>
                 <li>
-                  <Link to="/parties" className="navbar-brand">Parties</Link>
-                </li>
-                <li>
                   {this.state.authed
                     ? <span>
+                        <Link to="/dashboard" className="navbar-brand">Dashboard</Link>
+                        <Link to="/parties" className="navbar-brand">Parties</Link>
                         <Link to="/account" className="navbar-brand">Account</Link>
                         <button
                             style={{border: 'none', background: 'transparent'}}
@@ -96,8 +97,9 @@ export default class App extends Component {
                 <Route path='/' exact component={Home} />
                 <PublicRoute authed={this.state.authed} path='/login' component={Login} />
                 <PublicRoute authed={this.state.authed} path='/register' component={Register} />
+                <PrivateRoute authed={this.state.authed} path='/parties/:id' component={Party} />
+                <PrivateRoute authed={this.state.authed} path='/dashboard' component={Dashboard} />
                 <PrivateRoute authed={this.state.authed} path='/parties' component={Parties} />
-                <PrivateRoute authed={this.state.authed} path='/parties/create' component={CreateParty} />
                 <PrivateRoute authed={this.state.authed} path='/account' component={AccountManager} />
                 <Route render={() => <h3>404: Page not found.</h3>} />
               </Switch>

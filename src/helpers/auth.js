@@ -13,6 +13,14 @@ export function login (email, pw) {
   return firebaseAuth().signInWithEmailAndPassword(email, pw)
 }
 
+export function isAdmin() {
+    return firebaseAuth().currentUser;
+}
+
+export function isSocial() {
+    return firebaseAuth().currentUser;
+}
+
 export function getUser() {
     return firebaseAuth().currentUser;
 }

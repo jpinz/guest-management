@@ -8,7 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 export default class CreateParty extends Component {
     constructor(props) {
         super(props);
-        this.state = {name: 'Example Party',
+        this.state = {name: '',
             type: 'party',
             numberOfGuests: 2,
             date: moment()};
@@ -31,15 +31,17 @@ export default class CreateParty extends Component {
     }
 
     handleSubmit(event) {
-        console.log("Submitting");
-        //alert('Your favorite flavor is: ' + this.state.name);
-        var e = {};
-        e.type = this.state.type;
-        e.name = this.state.name;
-        e.date = this.state.date;
-        e.guestsPerBro = this.state.numberOfGuests;
-        console.log(e);
-        addEvent(e);
+        if(!this.state.name.toString()){
+            alert("Event name can't be empty!");
+        } else {
+            var e = {};
+            e.type = this.state.type;
+            e.name = this.state.name;
+            e.date = this.state.date.toObject();
+            e.guestsPerBro = this.state.numberOfGuests;
+            console.log(e);
+            addEvent(this.state.type, this.state.name, this.state.date.format('MM/DD/YYYY'), this.state.numberOfGuests);
+        }
         event.preventDefault();
     }
 
