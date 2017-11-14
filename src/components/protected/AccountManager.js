@@ -1,42 +1,52 @@
 import React, { Component } from 'react'
-import { getUser } from '../../helpers/auth'
+import { getUser, saveUser } from '../../helpers/auth'
 
 
 export default class AccountManager extends Component {
     constructor(props) {
         super(props);
-        this.user = getUser();
-        this.name = this.user.displayName;
-        this.email = this.user.email
+        this.state = {
+            user: getUser()
+        };
+        this.email =  getUser().email;
+        this.displayName = getUser().displayName
     }
     handleSubmit = (e) => {
-        if(!this.name.value.toString().isEmpty()) {
-            this.user.updateProfile({
-                displayName: this.name.value
+        if(this.displayName.value.toString()) {
+            console.log(this.displayName.value.toString());
+            this.state.user.updateProfile({
+                displayName: this.displayName.value.toString()
             }).then(function() {
                 // Update successful.
-                console.log("Update succeeded" + this.name.value);
+                console.log("Name update succeeded" + this);
             }).catch(function(error) {
                 // An error happened.
+                console.log(error);
             });
         }
-        if(!this.name.email.value.toString().isEmpty()) {
-            this.user.updateEmail(this.email.value).then(function () {
+        if(this.email.value.toString()) {
+            this.state.user.updateEmail(this.email.value.toString()).then(function () {
                 // Update successful.
+                saveUser(getUser());
+                console.log("Email update succeeded" + this);
             }).catch(function (error) {
                 // An error happened.
+                console.log(error);
             });
         }
-        e.preventDefault();
 
+
+        e.preventDefault();
     };
+
     render () {
+
         return (
           <div>
               Manage your account here:
               <form onSubmit={this.handleSubmit}>
                   <div className="form-group">
-                      <input  className="form-control" defaultValue ={this.name} placeholder="Name" ref={(name) => this.name= name} />
+                      <input  className="form-control" defaultValue ={this.displayName} placeholder="Name" ref={(name) => this.displayName = name} />
                   </div>
                   <div className="form-group">
                       <input className="form-control" defaultValue ={this.email} ref={(email) => this.email = email} placeholder="Email" />

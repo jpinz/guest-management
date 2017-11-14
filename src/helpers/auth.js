@@ -1,8 +1,7 @@
-import { ref, firebaseAuth } from '../config/constants'
+import { firebaseAuth, db } from '../config/constants'
 
 export function auth (email, pw) {
   return firebaseAuth().createUserWithEmailAndPassword(email, pw)
-    .then(saveUser)
 }
 
 export function logout () {
@@ -34,10 +33,8 @@ export function resetPassword (email) {
 }
 
 export function saveUser (user) {
-  return ref.child(`users/${user.uid}/info`)
-    .set({
-      email: user.email,
-      uid: user.uid
-    })
-    .then(() => user)
+    db.ref('users/' + user.uid).set({
+        name: user.displayName,
+        email: user.email
+    });
 }

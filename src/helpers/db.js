@@ -1,13 +1,13 @@
 import { db } from '../config/constants'
-import { getUID } from './auth'
-import React from 'react'
+import { getUID, getUser } from './auth'
 
 export function addMaleGuest (name, party) {
     var newUserId = db.ref().push().key;
 
     db.ref('guests/male/' + newUserId).set({
         name: name,
-        addedBy: getUID(),
+        addedByUID: getUser().uid,
+        addedByName: getUser().displayName,
         party: party,
         checkedIn: false
     });
@@ -31,14 +31,13 @@ db.collection("guests").doc("female").add({
 }
 
 export function getGuests() {
-return db.collection("guests");
+    return db.collection("guests");
 }
 
 export function getEvents() {
-var events = [];
-var eventsRef = db.ref('events/');
-eventsRef.on('value', function(snapshot) {
-    console.log(snapshot.val());
+    var eventsRef = db.ref('events/');
+    eventsRef.on('value', function(snapshot) {
+        console.log(snapshot.val());
 });
 
 
@@ -49,21 +48,14 @@ eventsRef.on('value', function(snapshot) {
 export function addEvent(type, name, date, guestsPerBro) {
 var newEventId = db.ref().push().key;
 
-db.ref('events/' + type + '/'+ newEventId).set({
+db.ref('events/'+ newEventId).set({
         name: name,
         date: date,
-        guestsPerBro: guestsPerBro
+        guestsPerBro: guestsPerBro,
+        type: type
     });
 }
-/*db.collection("events").add({
-    name: name,
-    type: type,
-    date: date,
-    guestsPerBro: guestsPerBro
-})
-    .then(function(docRef) {
-        console.log("Document written with ID: ", docRef.id);
-    })
-    .catch(function(error) {
-        console.error("Error adding document: ", error);
-    });*/
+
+export function capitalize(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}

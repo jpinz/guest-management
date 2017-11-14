@@ -1,13 +1,24 @@
 import React, { Component } from 'react'
 import { db } from '../../config/constants'
-import { Grid, Row, Col, ListGroup, ListGroupItem } from 'react-bootstrap';
-import { checkInGuest } from '../../helpers/db'
+import { ListGroup, ListGroupItem } from 'react-bootstrap';
+import { checkInGuest, capitalize } from '../../helpers/db'
+var moment = require('moment');
+
+
+function getAdded(uid) {
+    db.ref('/users/' + uid).once('value').then(function(snapshot) {
+        console.log(snapshot.val().name);
+        return snapshot.val().name;
+    });
+}
 
 export default class Party extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            males: []
+            males: [],
+            event: [],
+            id: props.match.params.id
         };
 
     }
@@ -16,6 +27,8 @@ export default class Party extends Component {
         console.log(id);
         //checkInGuest(id);
     }
+
+
 
     componentDidMount() {
         const malesRef = db.ref('guests/male');
@@ -26,13 +39,26 @@ export default class Party extends Component {
                 newGuy.push({
                     id: male,
                     name: males[male].name,
-                    addedBy: males[male].addedBy,
+                    addedByUID: males[male].addedByUID,
+                    addedByName: males[male].addedByName,
                     party: males[male].party,
                     checkedIn: males[male].checkedIn
                 });
             }
             this.setState({
                 males: newGuy
+            });
+        });
+
+
+
+        const eventRef = db.ref('events/' + this.state.id);
+        eventRef.on('value', (snapshot) => {
+            let event = snapshot.val();
+            event.type = capitalize(event.type);
+            event.date = moment(event.date).format("ddd, MMM Do YYYY");
+            this.setState({
+                event: event
             });
         });
     }
@@ -42,10 +68,12 @@ export default class Party extends Component {
 
         return (
             <div>
+                <h1>{this.state.event.name} - {this.state.event.type}</h1>
+                <h2>{this.state.event.date}</h2>
                 <ListGroup>
                     {this.state.males.map((male) => {
                         return (
-                            <ListGroupItem key={male.id} header={male.name} onClick={(e) => this.checkIn(male.id, e)}>Added by:{male.addedBy}</ListGroupItem>
+                            <ListGroupItem key={male.id} header={male.name} onClick={(e) => this.checkIn(male.id, e)}>Added by: {male.addedByName}</ListGroupItem>
                         )
                     })}
                 </ListGroup>

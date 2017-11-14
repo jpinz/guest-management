@@ -1,7 +1,4 @@
 import React, { Component } from 'react'
-import PartiesList from './PartiesList'
-import CreateParty from './CreateParty'
-import { Route, BrowserRouter, Link, Redirect, Switch } from 'react-router-dom'
 
 export default class Dashboard extends Component {
     render () {
