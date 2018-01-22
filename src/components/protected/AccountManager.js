@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { getUser, saveUser } from '../../helpers/auth'
+import {getUser, saveUser, setEmail, setUserName} from '../../helpers/auth'
 
 
 export default class AccountManager extends Component {
@@ -14,28 +14,12 @@ export default class AccountManager extends Component {
     handleSubmit = (e) => {
         if(this.displayName.value.toString()) {
             console.log(this.displayName.value.toString());
-            this.state.user.updateProfile({
-                displayName: this.displayName.value.toString()
-            }).then(function() {
-                // Update successful.
-                console.log("Name update succeeded" + this);
-            }).catch(function(error) {
-                // An error happened.
-                console.log(error);
-            });
+            setUserName(this.displayName.value.toString());
         }
         if(this.email.value.toString()) {
-            this.state.user.updateEmail(this.email.value.toString()).then(function () {
-                // Update successful.
-                saveUser(getUser());
-                console.log("Email update succeeded" + this);
-            }).catch(function (error) {
-                // An error happened.
-                console.log(error);
-            });
+            console.log(this.email.value.toString());
+            setEmail(this.email.value.toString());
         }
-
-
         e.preventDefault();
     };
 

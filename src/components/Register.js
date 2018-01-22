@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { auth, saveUser, getUser } from '../helpers/auth'
+import { auth, saveUser, getUser, setSocial, setAdmin } from '../helpers/auth'
 
 function setErrorMsg(error) {
   return {
@@ -14,6 +14,9 @@ export default class Register extends Component {
     auth(this.email.value, this.pw.value)
       .catch(e => this.setState(setErrorMsg(e)));
       saveUser(getUser());
+      setSocial(getUser(), false);
+      setAdmin(getUser(), false);
+
   };
   render () {
     return (

@@ -3,9 +3,8 @@ import 'bootstrap/dist/css/bootstrap.css'
 import { Route, BrowserRouter, Link, Redirect, Switch } from 'react-router-dom'
 import Login from './Login'
 import Register from './Register'
-import Home from './Home'
+import LoggedOutPage from './LoggedOutPage'
 import Parties from './protected/Parties'
-import Dashboard from './protected/Dashboard'
 import { logout, getUser, saveUser } from '../helpers/auth'
 import { firebaseAuth } from '../config/constants'
 import AccountManager from "./protected/AccountManager";
@@ -29,7 +28,18 @@ function PublicRoute ({component: Component, authed, ...rest}) {
             {...rest}
             render={(props) => authed === false
                 ? <Component {...props} />
-                : <Redirect to='/dashboard' />}
+                : <Redirect to='/account' />}
+        />
+    )
+}
+
+function HomeRoute ({component: Component, authed, ...rest}) {
+    return (
+        <Route
+            {...rest}
+            render={(props) => authed === false
+                ? <Component {...props} />
+                : <Redirect to='/parties' />}
         />
     )
 }
@@ -69,12 +79,8 @@ export default class App extends Component {
                             </div>
                             <ul className="nav navbar-nav pull-right">
                                 <li>
-                                    <Link to="/" className="navbar-brand">Home</Link>
-                                </li>
-                                <li>
                                     {this.state.authed
                                         ? <span>
-                                    <Link to="/dashboard" className="navbar-brand">Dashboard</Link>
                                     <Link to="/parties" className="navbar-brand">Parties</Link>
                                     <Link to="/account" className="navbar-brand">Account</Link>
                                     <button
@@ -94,11 +100,10 @@ export default class App extends Component {
                     <div className="container">
                         <div className="row">
                             <Switch>
-                                <Route path='/' exact component={Home} />
+                                <HomeRoute authed={this.state.authed} path='/' exact component={LoggedOutPage} />
                                 <PublicRoute authed={this.state.authed} path='/login' component={Login} />
                                 {<PublicRoute authed={this.state.authed} path='/register' component={Register} />}
                                 <PrivateRoute authed={this.state.authed} path='/parties/:id' component={Party} />
-                                <PrivateRoute authed={this.state.authed} path='/dashboard' component={Dashboard} />
                                 <PrivateRoute authed={this.state.authed} path='/parties' component={Parties} />
                                 <PrivateRoute authed={this.state.authed} path='/createEvent' component={CreateParty} />
                                 <PrivateRoute authed={this.state.authed} path='/account' component={AccountManager} />

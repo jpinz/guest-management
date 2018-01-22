@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import { addEvent } from '../../helpers/db'
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
+import {addEvent} from "../../utils/EventsUtils";
+import { browserHistory } from 'react-router'
 
 
 export default class CreateParty extends Component {
@@ -24,8 +25,10 @@ export default class CreateParty extends Component {
             });
         } else {
             const target = event.target;
+            console.log(target);
             const value = target.value;
             const name = target.name;
+            console.log("Value" + value +"Name" +  name);
             this.setState({[name]: value});
         }
     }
@@ -60,15 +63,16 @@ export default class CreateParty extends Component {
                   <input
                       name="numberOfGuests"
                       type="number"
-                      defaultValue={this.state.numberOfGuests}
-                      onChange={this.handleInputChange} />
+                      value={this.state.numberOfGuests}
+                      onChange={this.handleChange} />
               </label>
               <br />
               <label>
                   Type of event:
-                  <select value={this.state.type} onChange={this.handleChange}>
+                  <select name="type" value={this.state.type} onChange={this.handleChange}>
                       <option value="party">Party</option>
                       <option value="social">Social</option>
+                      <option value="pregame">Pregame</option>
                       <option value="semi">Semi-Formal</option>
                       <option value="nocial">Nocial</option>
                       <option value="other">Other</option>

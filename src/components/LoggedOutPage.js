@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 
-export default class Home extends Component {
+export default class LoggedOutPage extends Component {
   render () {
     return (
       <div>
-        <h1>Welcome to the Zeta Mu Chapter of TKE!</h1>
+        <h1>Please Log In!</h1>
       </div>
     )
   }

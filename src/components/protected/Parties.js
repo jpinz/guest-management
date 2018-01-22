@@ -1,10 +1,9 @@
 import React, {Component} from 'react'
-import { addMaleGuest } from '../../helpers/db'
 import { db } from '../../config/constants'
 import { ListGroup, ListGroupItem } from 'react-bootstrap';
 import { Link } from 'react-router-dom'
-
-export default class Parties extends Component {
+import {capitalize} from "../../utils/EventsUtils";
+    export default class Parties extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -15,7 +14,6 @@ export default class Parties extends Component {
 
     openEvent(id) {
         console.log(id);
-        addMaleGuest("Sample Guy", id);
     }
 
     componentDidMount() {
@@ -41,11 +39,11 @@ export default class Parties extends Component {
         return (
             <div>
 
-                <h1>List of parties here</h1>
+                <h1>Upcoming events:</h1>
                 <ListGroup>
                     {this.state.events.map((event) => {
                         return (
-                            <Link to={'/parties/' + event.id}><ListGroupItem key={event.id} header={event.name} onClick={(e) => this.openEvent(event.id, e)}>{event.date}</ListGroupItem></Link>
+                            <Link to={'/parties/' + event.id}><ListGroupItem key={event.id} header={event.name + " - " + capitalize(event.type)} onClick={(e) => this.openEvent(event.id, e)}>{event.date}</ListGroupItem></Link>
                         )
                     })}
                 </ListGroup>

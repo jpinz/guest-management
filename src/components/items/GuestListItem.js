@@ -1,66 +1,45 @@
 import React, { Component } from 'react';
 
-import AuthStore from '../stores/AuthStore';
+import {deleteGuest, setGuestStatus} from "../../utils/GuestUtils";
 
-import GuestActions from '../actions/GuestActions';
-
-require('styles/GuestList.css');
+require('../../styles/GuestList.css');
 
 
 export default class GuestListItem extends Component {
     constructor() {
         super();
-        this.onApprove = this.onApprove.bind(this);
         this.onDelete = this.onDelete.bind(this);
         this.onCheckIn = this.onCheckIn.bind(this);
     }
 
-    onApprove() {
-        const { guest } = this.props;
-        GuestActions.setGuestStatus(guest.id || guest._id, guest.party_id, 1);
-    }
 
     onDelete() {
-        const { guest } = this.props;
-        GuestActions.removeGuestFromParty(guest.id || guest._id, guest.party_id);
+        const {guest} = this.props;
+        const {id} = this.props;
+        deleteGuest(((guest.male) ? 'male' : 'female'), guest.id, id);
     }
 
     onCheckIn() {
-        const { guest } = this.props;
-        GuestActions.setGuestStatus(guest.id || guest._id, guest.party_id, 2);
+        const {guest} = this.props;
+        console.log(guest);
+        const {id} = this.props;
+        setGuestStatus(((guest.male) ? 'male' : 'female'), id, guest.id, true);
+
     }
 
     render() {
-        const { guest } = this.props;
-        const { open } = this.props;
+        const {guest} = this.props;
         let style = (guest.male) ? 'guest-list-item male' : 'guest-list-item female';
         let edit_string;
-        if(open){
-            if(guest.status != 2) {
-                edit_string = (<div className='pull-right'>
-                    <button className='btn btn-success' onClick={ this.onCheckIn }>
-                        <span className='glyphicon glyphicon-ok' aria-hidden='true'></span>
-                    </button>
-                </div>);
-            } else {
-                edit_string = (<div className='pull-right'>
-                    <button className='btn btn-danger' onClick={ this.onApprove }>
-                        <span className='glyphicon glyphicon-remove' aria-hidden='true'></span>
-                    </button>
-                </div>);
-            }
 
-        }
-        else if((guest.status == 0) && (AuthStore.isSocial())) {
+        if (!guest.checkedIn) {
             edit_string = (<div className='pull-right'>
-                <button className='btn btn-danger' onClick={ this.onDelete }>
-                    <span className='glyphicon glyphicon-remove' aria-hidden='true'></span>
-                </button>
-                <button className='btn btn-success' onClick={ this.onApprove }>
+                <button className='btn btn-success' onClick={this.onCheckIn}>
                     <span className='glyphicon glyphicon-ok' aria-hidden='true'></span>
                 </button>
             </div>);
-        } else if((AuthStore.isSocial()) || (AuthStore.getName() == guest.name)) {
+
+        } else {
             edit_string = (<div className='pull-right'>
                 <button className='btn btn-danger' onClick={ this.onDelete }>
                     <span className='glyphicon glyphicon-remove' aria-hidden='true'></span>
@@ -69,9 +48,8 @@ export default class GuestListItem extends Component {
         }
 
         return (
-            <li className={ style }><span className='guest-name'>{ guest.name }</span> - { guest.added_by } { edit_string }</li>
+            <li className={style}><span className='guest-name'>{guest.name}</span> - {guest.addedBy} {edit_string}
+            </li>
         );
     }
 }
-
- GuestListItem;
