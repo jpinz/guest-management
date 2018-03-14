@@ -1,13 +1,13 @@
 <template>
   <section class="section">
-    <h1 class="title has-text-centered">Register</h1>
+    <h1 class="title has-text-centered">Login</h1>
     <div class="columns">
       <div class="column is-one-third"/>
       <div class="column is-one-third">
 
         <div class="card">
           <div class="card-header is-centered">
-            <h2 class="card-header-title is-centered">Create an Account</h2>
+            <h2 class="card-header-title is-centered">Sign in to Your Account</h2>
           </div>
           <div class="card-content">
             <form v-on:submit.prevent>
@@ -23,7 +23,7 @@
                   <input class="input" type="password" v-model="password">
                 </div>
               </div>
-              <button type="submit" class="button is-primary" v-on:click="signUp">Sign-up</button>
+              <button type="submit" class="button is-primary" v-on:click="signIn">Sign-in</button>
             </form>
           </div>
         </div>
@@ -44,13 +44,12 @@
       };
     },
     methods: {
-      signUp: function () {
+      signIn: function () {
         Firebase.auth()
-          .createUserWithEmailAndPassword(this.email, this.password)
+          .signInWithEmailAndPassword(this.email, this.password)
           .then(
             user => {
-              alert("Please set your name in your account");
-              this.$router.replace('account');
+              this.$router.replace('parties');
             },
             error => {
               alert(error.message);
