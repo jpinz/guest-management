@@ -36,7 +36,7 @@
             <td v-if="male.checkedIn == -1">
               <button v-on:click="checkIn(male, true)" class="button is-info">Check in</button>
             </td>
-            <td v-else><span class="tag is-info">{{male.checkedIn}}</span></td>
+            <td v-else><span class="tag is-info is-medium">{{male.checkedIn}}</span></td>
           </tr>
           </tbody>
         </table>
@@ -58,7 +58,7 @@
             <td v-if="female.checkedIn == -1">
               <button v-on:click="checkIn(female, false)" class="button is-danger">Check in</button>
             </td>
-            <td v-else><span class="tag is-danger">{{female.checkedIn}}</span></td>
+            <td v-else><span class="tag is-danger is-medium">{{female.checkedIn}}</span></td>
           </tr>
           </tbody>
         </table>
