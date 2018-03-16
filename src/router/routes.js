@@ -5,6 +5,7 @@ import Error404 from '../components/Error404.vue';
 import Dashboard from '../components/Dashboard.vue';
 import Account from '../components/Account.vue';
 import Party from '../components/Party.vue';
+import CreateParty from '../components/CreateParty.vue';
 // This is where you add all your site routes
 // Each route is set as an obect in the array
 // For a the most basic route just set
@@ -29,6 +30,14 @@ export const routes = [{
     path: '/parties',
     name: 'parties',
     component: Dashboard,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/createParty',
+    name: 'createParty',
+    component: CreateParty,
     meta: {
       requiresAuth: true
     }

@@ -12,6 +12,12 @@
           <div class="card-content">
             <form v-on:submit.prevent>
               <div class="field">
+                <label class="label">Full Name</label>
+                <div class="control">
+                  <input class="input" placeholder="John Smith" v-model="name">
+                </div>
+              </div>
+              <div class="field">
                 <label class="label">Email</label>
                 <div class="control">
                   <input class="input" type="email" placeholder="example@email.com" v-model="email">
@@ -34,23 +40,41 @@
 </template>
 
 <script>
-  import Firebase from "firebase";
+  import firebase from "firebase";
 
   export default {
     data: function () {
       return {
         email: "",
-        password: ""
+        password: "",
+        name: ""
       };
     },
     methods: {
       signUp: function () {
-        Firebase.auth()
+        firebase.auth()
           .createUserWithEmailAndPassword(this.email, this.password)
           .then(
             user => {
-              alert("Please set your name in your account");
-              this.$router.replace('account');
+              let db = firebase.database();
+
+              name = this.name;
+              user.updateProfile({
+                displayName: name
+              }).then(function () {
+                // Update successful.
+                console.log("Successful name update: " + name)
+              }).catch(function (error) {
+                // An error happened.
+                alert("Error: " + error.message)
+              });
+
+              db.ref('bros/' + user.uid).set({
+                name: name,
+                email: user.email,
+                paid_bill: false,
+                role: "normal"
+              });
             },
             error => {
               alert(error.message);

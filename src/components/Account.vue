@@ -31,9 +31,9 @@
     },
     created() {
       let user = firebase.auth().currentUser;
-      var vm = this
+      let vm = this;
 
-      if (user != null) {
+      if (user !== null) {
         user.providerData.forEach(function (profile) {
           vm.userId = profile.uid;
           vm.name = profile.displayName;

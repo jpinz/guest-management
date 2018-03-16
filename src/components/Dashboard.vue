@@ -1,7 +1,33 @@
 <template>
   <section class="section">
     <h1 class="title has-text-centered">Parties</h1>
-    <table class="table is-fullwidth is-striped">
+
+    <div v-if="social == true">
+      <table class="table is-fullwidth is-striped">
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Date</th>
+          <th>Modify</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="event in events">
+          <th>
+            <router-link :to="`/party/${event.id}`">{{event.name}}</router-link>
+          </th>
+          <td>{{event.type}}</td>
+          <td>{{event.date}}</td>
+          <th>
+            <router-link :to="`/createParty?edit=${event.id}`">Edit</router-link>
+          </th>
+        </tr>
+        </tbody>
+      </table>
+      <router-link class="button" :to="`/createParty`">Add Party</router-link>
+    </div>
+    <table class="table is-fullwidth is-striped" v-else>
       <thead>
       <tr>
         <th>Name</th>
@@ -19,9 +45,6 @@
       </tr>
       </tbody>
     </table>
-    <br/>
-
-    <button v-on:click='addParty("Jungle Party 2", "party", 3, -1, 0)' class="button">Add Party</button>
   </section>
 </template>
 
@@ -32,12 +55,24 @@
   export default {
     data() {
       return {
-        events: []
+        events: [],
+        social: false,
+        name: '',
+        email: '',
+        userId: ''
       }
     },
     created() {
-      var db = firebase.database();
-      var vm = this;
+      let db = firebase.database();
+      let vm = this;
+      let user = firebase.auth().currentUser;
+
+      if (user !== null) {
+        vm.name = user.displayName;
+        vm.email = user.email;
+        vm.userId = user.uid;
+      }
+
       var eventsRef = db.ref('events/');
       eventsRef.on('value', function (snapshot) {
         let currEvents = snapshot.val();
@@ -51,24 +86,12 @@
             femaleGuests: currEvents[event].femaleGuests
           });
         }
-        console.log(snapshot.val());
-        console.log(vm.events);
-        console.log(vm.events[0].name);
-
       });
-    },
-    methods: {
-      addParty: function (name, type, maleGuests, femaleGuests, date) {
-        var db = firebase.database();
-        var newEventId = db.ref().push().key;
-        db.ref('events/' + newEventId).set({
-          name: name,
-          type: type,
-          maleGuests: maleGuests,
-          femaleGuests: femaleGuests,
-          date: date
-        });
-      }
+      db.ref('bros/' + vm.userId).once('value').then(function (snapshot) {
+        if (snapshot.val() && (snapshot.val().role === "admin" || snapshot.val().role === "social")) {
+          vm.social = true;
+        }
+      });
     }
   }
 
