@@ -28,13 +28,26 @@ const router = new VueRouter({
 // redirect to the sign-in page to enable them to sign-in
 router.beforeEach((to, from, next) => {
 
+  let db = Firebase.database();
   const currentUser = Firebase.auth().currentUser;
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const requiresSocial = to.matched.some(record => record.meta.requiresSocial);
+
 
   if (requiresAuth && !currentUser) {
     next('/sign-in');
   } else if (requiresAuth && currentUser) {
-    next();
+    db.ref('bros/' + currentUser.uid).once('value').then(function (snapshot) {
+      console.log("Role " + snapshot.val().role);
+      if (snapshot.val() && (snapshot.val().role === "admin" || snapshot.val().role === "social")) {
+        next();
+      } else if (requiresSocial) {
+        next(false);
+      } else {
+        next();
+      }
+    });
+
   } else {
     next();
   }

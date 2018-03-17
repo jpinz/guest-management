@@ -15,12 +15,12 @@
       <label class="label">Type of Event</label>
       <div class="select">
         <select v-model="type">
-          <option>Party</option>
-          <option>Social</option>
-          <option>Pregame</option>
-          <option>Semi-Formal</option>
-          <option>Nocial</option>
-          <option>Other</option>
+          <option value="party">Party</option>
+          <option value="social">Social</option>
+          <option value="pregame">Pregame</option>
+          <option value="semi-formal">Semi-Formal</option>
+          <option value="nocial">Nocial</option>
+          <option value="other">Other</option>
         </select>
       </div>
 
@@ -65,7 +65,7 @@
         name: '',
         email: '',
         missingName: false,
-        type: 'Social',
+        type: 'social',
         date: new Date(),
         time: new Date(),
         maleGuestCount: 0,

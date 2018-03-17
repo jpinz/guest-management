@@ -2,17 +2,21 @@
   <section class="section">
     <h1 class="title has-text-centered">{{party_name}}</h1>
     <h4 class="subtitle has-text-centered is-4">{{party_date}} - {{party_type}}</h4>
-
+    <div class="field" id="center">
+      <span>Front Door Mode enabled: </span>
+      <b-switch v-model="isFrontDoor">
+      </b-switch>
+    </div>
+    <br/>
     <div class="field">
       <div v-if="paid_bill" class="control">
         <input v-model="input" class="input" type="text" placeholder="Enter your name" id="searchbar">
-
         <br/>
         <div class="addGuest">
-          <button v-on:click='addMale(input , -1, name, userId)' class="button  is-info">Add Male(s)</button>
+          <button v-on:click='addMale(input , -1, name, userId)' class="button is-info">Add Male(s)</button>
         </div>
         <div class="addGuest">
-          <button v-on:click='addFemale(input, -1, name, userId)' class="button  is-danger" style="margin-left: 20px;">
+          <button v-on:click='addFemale(input, -1, name, userId)' class="button is-danger" style="margin-left: 20px;">
             Add Female(s)
           </button>
         </div>
@@ -40,17 +44,22 @@
             <th>Name</th>
             <th>Added By</th>
             <th>Checked In</th>
+            <th v-if="!isFrontDoor && social">Delete</th>
           </tr>
           </thead>
           <tbody>
-          <tr v-for="male in filteredMales" :key="male.id">
+          <tr v-for="(male, index) in filteredMales" :key="male.id">
             <th>{{male.name}}</th>
             <td>{{male.addedByName}}</td>
             <td v-if="male.checkedIn == -1">
-              <button v-on:click="checkIn(male, true)" class="button is-info" :disabled="social == false">Check in
+              <button v-on:click="checkIn(male, true)" class="button is-info"
+                      :disabled="social == false || !isFrontDoor">Check in
               </button>
             </td>
             <td v-else><span class="tag is-info is-medium">{{male.checkedIn}}</span></td>
+            <th v-if="!isFrontDoor && social">
+              <button v-on:click="remove(male, true, index)" class="button is-link">Delete</button>
+            </th>
           </tr>
           </tbody>
         </table>
@@ -63,18 +72,23 @@
             <th>Name</th>
             <th>Added By</th>
             <th>Checked In</th>
+            <th v-if="!isFrontDoor && social">Delete</th>
           </tr>
           </thead>
           <tbody>
-          <tr v-for="female in filteredFemales" :key="female.id">
+          <tr v-for="(female, index) in filteredFemales" :key="female.id">
             <th>{{female.name}}</th>
             <td>{{female.addedByName}}</td>
             <td v-if="female.checkedIn == -1">
-              <button v-on:click="checkIn(female, false)" class="button is-danger" :disabled="social == false">
+              <button v-on:click="checkIn(female, false)" class="button is-danger"
+                      :disabled="social == false || !isFrontDoor">
                 Check in
               </button>
             </td>
             <td v-else><span class="tag is-danger is-medium">{{female.checkedIn}}</span></td>
+            <th v-if="!isFrontDoor && social">
+              <button v-on:click="remove(female, false, index)" class="button is-link">Delete</button>
+            </th>
           </tr>
           </tbody>
         </table>
@@ -90,6 +104,7 @@
             <th>Name</th>
             <th>Added By</th>
             <th v-if="social == true">Approve</th>
+            <th v-if="!isFrontDoor && social">Delete</th>
           </tr>
           </thead>
           <tbody>
@@ -99,6 +114,9 @@
             <td v-if="social == true">
               <button v-on:click="approve(male, true, index)" class="button is-info">Approve</button>
             </td>
+            <th v-if="!isFrontDoor && social">
+              <button v-on:click="remove(male, true, index)" class="button is-link">Delete</button>
+            </th>
           </tr>
           </tbody>
         </table>
@@ -111,6 +129,7 @@
             <th>Name</th>
             <th>Added By</th>
             <th v-if="social == true">Approve</th>
+            <th v-if="!isFrontDoor && social">Delete</th>
           </tr>
           </thead>
           <tbody>
@@ -120,6 +139,9 @@
             <td v-if="social == true">
               <button v-on:click="approve(female, false, index)" class="button is-danger">Approve</button>
             </td>
+            <th v-if="!isFrontDoor && social">
+              <button v-on:click="remove(female, false, index)" class="button is-link">Delete</button>
+            </th>
           </tr>
           </tbody>
         </table>
@@ -140,6 +162,7 @@
         email: '',
         social: false,
         paid_bill: true,
+        isFrontDoor: false,
         party_name: '',
         party_id: this.$route.params.id.toString(),
         party_date: '',
@@ -166,6 +189,7 @@
         vm.name = user.displayName;
         vm.email = user.email;
       }
+      console.log("Is front door?: " + vm.isFrontDoor);
 
       const eventRef = db.ref('events/' + this.$route.params.id);
       eventRef.on('value', (snapshot) => {
@@ -313,6 +337,21 @@
           });
         }
       },
+      remove: function (guest, isMale, index) {
+        let db = firebase.database();
+        if (isMale) {
+          let addr = 'events/' + this.$route.params.id + '/males/';
+          this.malesApproval.splice(index, 1);
+
+          db.ref(addr + guest.id).remove();
+        } else {
+          console.log("Approving: " + guest.name);
+          let addr = 'events/' + this.$route.params.id + '/females/';
+          this.femalesApproval.splice(index, 1);
+
+          db.ref(addr + guest.id).remove();
+        }
+      },
       addMale: function (nameInput, checkedIn, addedByName, addedByUID) {
         this.input = '';
         let vm = this;
@@ -322,8 +361,12 @@
         let db = firebase.database();
         let hitLimit = false;
         names.every(function (name) {
+          name = name.replace(/[~!@#$%^&*()_|+\-=?;:",.<>\{\}\[\]\\\/]/gi, '').replace(/[0-9]/g, '');
+
           if (vm.males.some(e => e.name === name)) {
             console.log(name + " has already been added.");
+          } else if (!name || name === undefined || name === "" || name.length === 0) {
+            console.log("Name was empty, didn't add");
           } else {
             if (vm.malesAdded >= vm.maleLimit && !vm.social) {
               hitLimit = true;
@@ -367,8 +410,12 @@
         let addr = 'events/' + this.$route.params.id + '/females';
         let hitLimit = false;
         names.every(function (name) {
+          name = name.replace(/[~!@#$%^&*()_|+\-=?;:",.<>\{\}\[\]\\\/]/gi, '').replace(/[0-9]/g, '');
+
           if (vm.females.some(e => e.name === name)) {
             console.log(name + " has already been added.");
+          } else if (!name || name === undefined || name === "" || name.length === 0) {
+            console.log("Name was empty, didn't add");
           } else {
             if (vm.femalesAdded >= vm.femaleLimit && !vm.social) {
               hitLimit = true;
@@ -412,5 +459,11 @@
   .addGuest {
     padding-top: 20px;
     float: left;
+  }
+
+  #center {
+    text-align: center;
+    margin: 0 auto;
+    width: 50%;
   }
 </style>

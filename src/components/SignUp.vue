@@ -52,6 +52,7 @@
     },
     methods: {
       signUp: function () {
+        let vm = this;
         firebase.auth()
           .createUserWithEmailAndPassword(this.email, this.password)
           .then(
@@ -69,12 +70,18 @@
                 alert("Error: " + error.message)
               });
 
+              let sortKeyArr = name.split(' ');
+              let sortKey = sortKeyArr.splice(1).join('') + sortKeyArr[0];
+
               db.ref('bros/' + user.uid).set({
                 name: name,
                 email: user.email,
                 paid_bill: false,
+                sortKey: sortKey,
+                verified: false,
                 role: "normal"
               });
+              vm.$router.push({path: '/parties'})
             },
             error => {
               alert(error.message);

@@ -1,6 +1,6 @@
 <template>
-  <section class="section">
-    <h1 class="title has-text-centered">Parties</h1>
+  <section v-if="verified" class="section">
+    <h1 class="title has-text-centered">Events</h1>
 
     <div v-if="social == true">
       <table class="table is-fullwidth is-striped">
@@ -17,7 +17,7 @@
           <th>
             <router-link :to="`/party/${event.id}`">{{event.name}}</router-link>
           </th>
-          <td>{{event.type}}</td>
+          <td>{{capitalize(event.type)}}</td>
           <td>{{event.date}}</td>
           <th>
             <router-link :to="`/createParty?edit=${event.id}`">Edit</router-link>
@@ -46,6 +46,12 @@
       </tbody>
     </table>
   </section>
+  <section v-else>
+    <br/>
+    <div class="notification is-danger">
+      Your account has not been verified, please reach out to social to have them verify it for you.
+    </div>
+  </section>
 </template>
 
 <script>
@@ -59,7 +65,8 @@
         social: false,
         name: '',
         email: '',
-        userId: ''
+        userId: '',
+        verified: false
       }
     },
     created() {
@@ -91,7 +98,13 @@
         if (snapshot.val() && (snapshot.val().role === "admin" || snapshot.val().role === "social")) {
           vm.social = true;
         }
+        vm.verified = snapshot.val().verified;
       });
+    },
+    methods: {
+      capitalize: function (str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+      }
     }
   }
 

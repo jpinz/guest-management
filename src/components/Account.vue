@@ -2,11 +2,7 @@
   <section class="section">
     <h1 class="title has-text-centered">Manage Your Account</h1>
     <div class="field">
-      <label class="label">Name</label>
       <div class="control">
-        <input v-model="name" class="input" type="text" placeholder="Enter your name">
-        <button v-on:click="changeName" class="button is-link">Change Name</button>
-
         <label class="label">Email</label>
         <input v-model="email" class="input" type="email" placeholder="Email input">
         <button v-on:click="changeEmail" class="button is-link">Change Email</button>
@@ -42,19 +38,6 @@
       }
     },
     methods: {
-      changeName: function (event) {
-        let user = firebase.auth().currentUser;
-        name = this.name;
-        user.updateProfile({
-          displayName: name
-        }).then(function () {
-          // Update successful.
-          console.log("Successful update: " + name)
-        }).catch(function (error) {
-          // An error happened.
-          alert("Error: " + error.message)
-        });
-      },
       changeEmail: function (event) {
         let user = firebase.auth().currentUser;
         user.updateEmail(this.email).then(function () {
