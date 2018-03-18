@@ -13,8 +13,14 @@
             <form v-on:submit.prevent>
               <div class="field">
                 <label class="label">Full Name</label>
-                <div class="control">
-                  <input class="input" placeholder="John Smith" v-model="name">
+                <div class="control has-icons-right">
+                  <input v-model="name" class="input" v-bind:class="{ 'input is-danger ': missingName}" type="text"
+                         placeholder="Name">
+                  <span v-if="missingName" class="icon is-small is-right">
+                    <i class="fas fa-exclamation-triangle"></i>
+                  </span>
+                  <p v-if="missingName" class="help is-danger">Please enter a name.</p>
+
                 </div>
               </div>
               <div class="field">
@@ -47,12 +53,17 @@
       return {
         email: "",
         password: "",
-        name: ""
+        name: "",
+        missingName: false,
       };
     },
     methods: {
       signUp: function () {
         let vm = this;
+        if (!vm.name || vm.name === undefined || vm.name === "" || vm.name.length === 0) {
+          vm.missingName = true;
+          return;
+        }
         firebase.auth()
           .createUserWithEmailAndPassword(this.email, this.password)
           .then(
@@ -81,7 +92,7 @@
                 verified: false,
                 role: "normal"
               });
-              vm.$router.push({path: '/parties'})
+              vm.$router.push({path: '/'})
             },
             error => {
               alert(error.message);

@@ -2,7 +2,7 @@
   <section class="section">
     <h1 class="title has-text-centered">{{party_name}}</h1>
     <h4 class="subtitle has-text-centered is-4">{{party_date}} - {{party_type}}</h4>
-    <div class="field" id="center">
+    <div class="field" id="center" v-if="social">
       <span>Front Door Mode enabled: </span>
       <b-switch v-model="isFrontDoor">
       </b-switch>
@@ -195,7 +195,7 @@
       eventRef.on('value', (snapshot) => {
         let event = snapshot.val();
         vm.party_type = this.capitalize(event.type);
-        vm.party_date = moment(event.date).format("ddd, MMM Do YYYY");
+        vm.party_date = moment(event.party_date).format("ddd, MMM Do YYYY");
         vm.party_name = event.name;
         (event.maleGuests !== -1 ) ? vm.maleLimit = event.maleGuests : vm.maleLimit = '∞';
         (event.femaleGuests !== -1 ) ? vm.femaleLimit = event.femaleGuests : vm.femaleLimit = '∞';

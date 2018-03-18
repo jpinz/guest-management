@@ -1,6 +1,7 @@
 <template>
   <section class="section">
-    <h1 class="title has-text-centered">Create a new Event</h1>
+    <h1 v-if="!party_id" class="title has-text-centered">Create a new Event</h1>
+    <h1 v-else='' class="title has-text-centered">Edit {{name}}</h1>
     <div class="field">
       <label class="label">Name</label>
       <div class="control has-icons-right">
@@ -25,17 +26,10 @@
       </div>
 
       <b-field label="Select Date">
-        <b-datepicker v-model="date"
+        <b-datepicker v-model="party_date"
                       placeholder="Type or select a date..."
                       icon="calendar-today">
         </b-datepicker>
-      </b-field>
-      <b-field label="Select Time">
-        <b-timepicker v-model="time"
-                      placeholder="Type or select a time..."
-                      icon="clock"
-                      :readonly="false">
-        </b-timepicker>
       </b-field>
 
       <label class="label">Number of Male Guests per Brother</label>
@@ -48,8 +42,12 @@
         <input v-model="femaleGuestCount" class="input" type="Number" placeholder="Number">
       </div>
       <br/>
-      <button v-on:click='addParty(name, type, parseInt(maleGuestCount), parseInt(femaleGuestCount), date)'
+      <button v-on:click='addParty'
               class="button">Add Party
+      </button>
+      <br/>
+      <button v-if="party_id" v-on:click='remove'
+              class="button is-warning">Delete Event
       </button>
     </div>
   </section>
@@ -64,19 +62,33 @@
         userId: '',
         name: '',
         email: '',
+        party_id: this.$route.query.edit,
         missingName: false,
         type: 'social',
-        date: new Date(),
-        time: new Date(),
+        party_date: new Date(),
         maleGuestCount: 0,
         femaleGuestCount: 0
       }
     },
     created() {
+      let db = firebase.database();
+      let vm = this;
 
+      if (vm.party_id) {
+        const eventRef = db.ref('events/' + vm.party_id);
+        eventRef.on('value', (snapshot) => {
+          let event = snapshot.val();
+          vm.type = event.type;
+          vm.party_date = new Date(event.party_date);
+          vm.name = event.name;
+          (event.maleGuests !== -1 ) ? vm.maleGuestCount = event.maleGuests : vm.maleGuestCount = -1;
+          (event.femaleGuests !== -1 ) ? vm.femaleGuestCount = event.femaleGuests : vm.femaleGuestCount = -1;
+        });
+
+      }
     },
     methods: {
-      addParty: function (name, type, maleGuests, femaleGuests, date) {
+      addParty: function () {
         let db = firebase.database();
         let vm = this;
 
@@ -84,18 +96,51 @@
           vm.missingName = true;
           return;
         }
-        //date.setTime(vm.time.getTime());
-        let newEventId = db.ref().push().key;
-        db.ref('events/' + newEventId).set({
-          name: name,
-          type: type,
-          maleGuests: maleGuests,
-          femaleGuests: femaleGuests,
-          date: date
-        });
+        if (vm.type === "pregame") {
+          vm.party_date.setHours(21);
+        } else {
+          vm.party_date.setHours(22);
+        }
 
-        this.$router.push({path: `/party/${newEventId}`})
+        if (vm.party_id) {
+          console.log("Updating party: " + vm.party_id);
+          db.ref('events/' + vm.party_id).update({
+            name: vm.name,
+            type: vm.type,
+            maleGuests: parseInt(vm.maleGuestCount),
+            femaleGuests: parseInt(vm.femaleGuestCount),
+            party_date: vm.party_date.getTime()
+          });
+          this.$router.push({path: `/party/${vm.party_id}`});
+        } else {
+          let newEventId = db.ref().push().key;
+          db.ref('events/' + newEventId).set({
+            name: vm.name,
+            type: vm.type,
+            maleGuests: parseInt(vm.maleGuestCount),
+            femaleGuests: parseInt(vm.femaleGuestCount),
+            party_date: vm.party_date.getTime()
+          });
+          this.$router.push({path: `/party/${newEventId}`});
+        }
+      },
+      remove: function () {
+        let db = firebase.database();
+        let vm = this;
+        let deletion = false;
 
+        if (confirm("Are you sure you want to delete this event?")) {
+          deletion = true;
+        }
+        if (deletion) {
+          db.ref('events/' + vm.party_id).remove();
+          db.ref('bros/').once('value').then(function (snapshot) {
+            for (let key in snapshot.val()) {
+              db.ref('bros/' + key + '/events/' + vm.party_id).remove();
+            }
+          });
+          vm.$router.push({path: `/parties`});
+        }
       }
     },
   };

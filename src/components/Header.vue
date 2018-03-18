@@ -1,8 +1,7 @@
 <template>
   <header>
     <nav>
-      <router-link to="/" class="button">Home</router-link>
-      <router-link to="parties" class="button" v-if="user">Events</router-link>
+      <router-link to="/" class="button" v-if="user">Events</router-link>
       <router-link to="account" class="button" v-if="user">Account</router-link>
       <router-link to="social" class="button" v-if="social">Social Settings</router-link>
       <router-link to="sign-in" class="button" v-if="!user">Login</router-link>

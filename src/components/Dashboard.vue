@@ -87,7 +87,7 @@
           vm.events.push({
             id: event,
             name: currEvents[event].name,
-            date: moment(currEvents[event].date).format("ddd, MMM Do YYYY"),
+            date: moment(currEvents[event].party_date).format("ddd, MMM Do YYYY"),
             type: currEvents[event].type,
             maleGuests: currEvents[event].maleGuests,
             femaleGuests: currEvents[event].femaleGuests

@@ -1,4 +1,3 @@
-import Home from '../components/Home.vue';
 import SignIn from '../components/SignIn.vue';
 import SignUp from '../components/SignUp.vue';
 import Error404 from '../components/Error404.vue';
@@ -12,11 +11,11 @@ import SocialAdmin from '../components/SocialAdmin.vue';
 // For a the most basic route just set
 // the path & component to load
 
-export const routes = [{
-  path: '',
-  name: 'home',
-  component: Home
-},
+export const routes = [
+  //Redirects
+  {path: '/party/account', redirect: '/account'},
+  {path: '/party/social', redirect: '/social'},
+  //Routes
   {
     path: '/sign-in',
     name: 'signIn',
@@ -28,7 +27,7 @@ export const routes = [{
     component: SignUp
   },
   {
-    path: '/parties',
+    path: '',
     name: 'parties',
     component: Dashboard,
     meta: {
