@@ -315,6 +315,7 @@
         return str.charAt(0).toUpperCase() + str.slice(1);
       },
       checkIn: function (guest, isMale) {
+        this.input = '';
         let db = firebase.database();
         let d = new Date();
         if (isMale) {
@@ -322,6 +323,9 @@
         } else {
           db.ref('events/' + this.$route.params.id + '/females/' + guest.id).update({'checkedIn': d.getTime()});
         }
+        document.getElementById("searchbar").focus();
+
+
       },
       approve: function (guest, isMale, index) {
         let db = firebase.database();
