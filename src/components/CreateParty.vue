@@ -139,7 +139,7 @@
               db.ref('bros/' + key + '/events/' + vm.party_id).remove();
             }
           });
-          vm.$router.push({path: `/parties`});
+          vm.$router.push({path: `/`});
         }
       }
     },

@@ -49,7 +49,7 @@
           .signInWithEmailAndPassword(this.email, this.password)
           .then(
             user => {
-              this.$router.replace('parties');
+              this.$router.replace('/');
             },
             error => {
               alert(error.message);
