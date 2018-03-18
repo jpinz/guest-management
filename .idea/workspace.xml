@@ -4,11 +4,7 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="60d01091-1b86-4264-b345-3e71dffddfca" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/components/CreateParty.vue" afterPath="$PROJECT_DIR$/src/components/CreateParty.vue" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/components/Dashboard.vue" afterPath="$PROJECT_DIR$/src/components/Dashboard.vue" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/components/Party.vue" afterPath="$PROJECT_DIR$/src/components/Party.vue" />
-    </list>
+    <list default="true" id="60d01091-1b86-4264-b345-3e71dffddfca" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
     <ignored path="$PROJECT_DIR$/tmp/" />
@@ -73,11 +69,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CreateParty.vue" pinned="false" current-in-tab="false">
+      <file leaf-file-name="CreateParty.vue" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/components/CreateParty.vue">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1542">
-              <caret line="52" column="37" lean-forward="false" selection-start-line="52" selection-start-column="37" selection-end-line="52" selection-end-column="37" />
+            <state relative-caret-position="3366">
+              <caret line="102" column="37" lean-forward="true" selection-start-line="102" selection-start-column="37" selection-end-line="102" selection-end-column="37" />
               <folding />
             </state>
           </provider>
@@ -113,7 +109,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Party.vue" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Party.vue" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/components/Party.vue">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="693">
@@ -396,7 +392,7 @@
       <workItem from="1520896253354" duration="31608000" />
       <workItem from="1520998343975" duration="21278000" />
       <workItem from="1521173121081" duration="4248000" />
-      <workItem from="1521212844977" duration="36972000" />
+      <workItem from="1521212844977" duration="37576000" />
     </task>
     <task id="LOCAL-00001" summary="A lot of changes to the app. No more dashboard. Making progress.">
       <created>1516580583907</created>
@@ -465,7 +461,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="233403000" />
+    <option name="totallyTimeSpent" value="234007000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-13" y="-13" width="3026" height="1946" extended-state="6" />
@@ -793,14 +789,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/components/CreateParty.vue">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1542">
-          <caret line="52" column="37" lean-forward="false" selection-start-line="52" selection-start-column="37" selection-end-line="52" selection-end-column="37" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/components/Party.vue">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="693">
@@ -809,6 +797,14 @@
             <element signature="n#style#0;n#button#0;n#div#1;n#div#0;n#div#1;n#section#0;n#template#0;n#!!top" expanded="true" />
             <element signature="e#6148#6179#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/CreateParty.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3366">
+          <caret line="102" column="37" lean-forward="true" selection-start-line="102" selection-start-column="37" selection-end-line="102" selection-end-column="37" />
+          <folding />
         </state>
       </provider>
     </entry>
