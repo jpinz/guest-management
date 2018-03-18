@@ -1,6 +1,7 @@
 <template>
   <section class="section">
     <h1 class="title has-text-centered">Manage Social Stuff</h1>
+    <router-link to="social/blacklist" class="button is-danger">Manage Blacklist</router-link>
     <table class="table is-fullwidth is-striped">
       <thead>
       <tr>

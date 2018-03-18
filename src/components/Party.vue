@@ -10,7 +10,7 @@
     <br/>
     <div class="field">
       <div v-if="paid_bill" class="control">
-        <input v-model="input" class="input" type="text" placeholder="Enter your name" id="searchbar">
+        <input v-model="input" class="input" type="text" placeholder="Enter guest name(s)" id="searchbar">
         <br/>
         <div class="addGuest">
           <button v-on:click='addMale(input , -1, name, userId)' class="button is-info">Add Male(s)</button>
@@ -58,7 +58,7 @@
             </td>
             <td v-else><span class="tag is-info is-medium">{{male.checkedIn}}</span></td>
             <th v-if="!isFrontDoor && social">
-              <button v-on:click="remove(male, true, index)" class="button is-link">Delete</button>
+              <button v-on:click="remove(male, true, index, false)" class="button is-link">Delete</button>
             </th>
           </tr>
           </tbody>
@@ -87,7 +87,7 @@
             </td>
             <td v-else><span class="tag is-danger is-medium">{{female.checkedIn}}</span></td>
             <th v-if="!isFrontDoor && social">
-              <button v-on:click="remove(female, false, index)" class="button is-link">Delete</button>
+              <button v-on:click="remove(female, false, index, false)" class="button is-link">Delete</button>
             </th>
           </tr>
           </tbody>
@@ -115,7 +115,7 @@
               <button v-on:click="approve(male, true, index)" class="button is-info">Approve</button>
             </td>
             <th v-if="!isFrontDoor && social">
-              <button v-on:click="remove(male, true, index)" class="button is-link">Delete</button>
+              <button v-on:click="remove(male, true, index, true)" class="button is-link">Delete</button>
             </th>
           </tr>
           </tbody>
@@ -140,7 +140,7 @@
               <button v-on:click="approve(female, false, index)" class="button is-danger">Approve</button>
             </td>
             <th v-if="!isFrontDoor && social">
-              <button v-on:click="remove(female, false, index)" class="button is-link">Delete</button>
+              <button v-on:click="remove(female, false, index, true)" class="button is-link">Delete</button>
             </th>
           </tr>
           </tbody>
@@ -168,6 +168,7 @@
         party_date: '',
         party_type: '',
         input: '',
+        blacklist: [],
         males: [],
         females: [],
         malesApproval: [],
@@ -189,7 +190,6 @@
         vm.name = user.displayName;
         vm.email = user.email;
       }
-      console.log("Is front door?: " + vm.isFrontDoor);
 
       const eventRef = db.ref('events/' + this.$route.params.id);
       eventRef.on('value', (snapshot) => {
@@ -199,6 +199,15 @@
         vm.party_name = event.name;
         (event.maleGuests !== -1 ) ? vm.maleLimit = event.maleGuests : vm.maleLimit = '∞';
         (event.femaleGuests !== -1 ) ? vm.femaleLimit = event.femaleGuests : vm.femaleLimit = '∞';
+      });
+
+      const blacklistRef = db.ref('blacklist/');
+      blacklistRef.on('value', (snapshot) => {
+        let i = 0;
+        snapshot.forEach(function (child) {
+          vm.$set(vm.blacklist, i, child.val().name);
+          i++;
+        });
       });
 
       const malesRef = db.ref('events/' + this.$route.params.id + '/males');
@@ -316,6 +325,7 @@
       },
       approve: function (guest, isMale, index) {
         let db = firebase.database();
+        console.log("Approving: " + guest.name);
         if (isMale) {
           let addr = 'events/' + this.$route.params.id + '/males';
           this.malesApproval.splice(index, 1);
@@ -326,7 +336,6 @@
             db.ref(addr + '_approval/' + guest.id).remove();
           });
         } else {
-          console.log("Approving: " + guest.name);
           let addr = 'events/' + this.$route.params.id + '/females';
           this.femalesApproval.splice(index, 1);
 
@@ -337,19 +346,33 @@
           });
         }
       },
-      remove: function (guest, isMale, index) {
+      remove: function (guest, isMale, index, approvalList) {
         let db = firebase.database();
-        if (isMale) {
-          let addr = 'events/' + this.$route.params.id + '/males/';
-          this.malesApproval.splice(index, 1);
+        console.log("Removing guest: " + guest.name);
+        if (approvalList) {
+          if (isMale) {
+            let addr = 'events/' + this.$route.params.id + '/males_approval/';
+            this.malesApproval.splice(index, 1);
 
-          db.ref(addr + guest.id).remove();
+            db.ref(addr + guest.id).remove();
+          } else {
+            let addr = 'events/' + this.$route.params.id + '/females_approval/';
+            this.femalesApproval.splice(index, 1);
+
+            db.ref(addr + guest.id).remove();
+          }
         } else {
-          console.log("Approving: " + guest.name);
-          let addr = 'events/' + this.$route.params.id + '/females/';
-          this.femalesApproval.splice(index, 1);
+          if (isMale) {
+            let addr = 'events/' + this.$route.params.id + '/males/';
+            this.males.splice(index, 1);
 
-          db.ref(addr + guest.id).remove();
+            db.ref(addr + guest.id).remove();
+          } else {
+            let addr = 'events/' + this.$route.params.id + '/females/';
+            this.males.splice(index, 1);
+
+            db.ref(addr + guest.id).remove();
+          }
         }
       },
       addMale: function (nameInput, checkedIn, addedByName, addedByUID) {
@@ -361,9 +384,11 @@
         let db = firebase.database();
         let hitLimit = false;
         names.every(function (name) {
-          name = name.replace(/[~!@#$%^&*()_|+\-=?;:",.<>\{\}\[\]\\\/]/gi, '').replace(/[0-9]/g, '');
+          name = name.replace(/[~!@#$%^&*()_|+\-=?;:",.<>\{\}\[\]\\\/]/gi, '').replace(/[0-9]/g, '').trim();
 
-          if (vm.males.some(e => e.name === name)) {
+          if (vm.blacklist.includes(name)) {
+            alert(name + " is on the blacklist! They will not be added to the guest list.");
+          } else if (vm.males.some(e => e.name === name)) {
             console.log(name + " has already been added.");
           } else if (!name || name === undefined || name === "" || name.length === 0) {
             console.log("Name was empty, didn't add");
@@ -412,7 +437,9 @@
         names.every(function (name) {
           name = name.replace(/[~!@#$%^&*()_|+\-=?;:",.<>\{\}\[\]\\\/]/gi, '').replace(/[0-9]/g, '');
 
-          if (vm.females.some(e => e.name === name)) {
+          if (vm.blacklist.includes(name)) {
+            alert(name + " is on the blacklist! They will not be added to the guest list.");
+          } else if (vm.females.some(e => e.name === name)) {
             console.log(name + " has already been added.");
           } else if (!name || name === undefined || name === "" || name.length === 0) {
             console.log("Name was empty, didn't add");

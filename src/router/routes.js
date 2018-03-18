@@ -6,8 +6,10 @@ import Account from '../components/Account.vue';
 import Party from '../components/Party.vue';
 import CreateParty from '../components/CreateParty.vue';
 import SocialAdmin from '../components/SocialAdmin.vue';
+import Blacklist from '../components/Blacklist.vue';
+
 // This is where you add all your site routes
-// Each route is set as an obect in the array
+// Each route is set as an object in the array
 // For a the most basic route just set
 // the path & component to load
 
@@ -15,6 +17,9 @@ export const routes = [
   //Redirects
   {path: '/party/account', redirect: '/account'},
   {path: '/party/social', redirect: '/social'},
+  {path: '/social/account', redirect: '/account'},
+  {path: '/social/social', redirect: '/social'},
+
   //Routes
   {
     path: '/sign-in',
@@ -54,6 +59,15 @@ export const routes = [
     path: '/social',
     name: 'social',
     component: SocialAdmin,
+    meta: {
+      requiresAuth: true,
+      requiresSocial: true,
+    }
+  },
+  {
+    path: '/social/blacklist',
+    name: 'blacklist',
+    component: Blacklist,
     meta: {
       requiresAuth: true,
       requiresSocial: true,
