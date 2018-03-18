@@ -42,12 +42,15 @@
         <input v-model="femaleGuestCount" class="input" type="Number" placeholder="Number">
       </div>
       <br/>
-      <button v-on:click='addParty'
-              class="button">Add Party
+      <button v-if="party_id" v-on:click='addParty'
+              class="button is-link">Edit Event
       </button>
-      <br/>
+      <button v-else v-on:click='addParty'
+              class="button is-link">Add Party
+      </button>
+      <br/><br/>
       <button v-if="party_id" v-on:click='remove'
-              class="button is-warning">Delete Event
+              class="button is-danger">Delete Event
       </button>
     </div>
   </section>
@@ -92,7 +95,7 @@
         let db = firebase.database();
         let vm = this;
 
-        if (!name || name === undefined || name === "" || name.length === 0) {
+        if (!vm.name || vm.name === undefined || vm.name === "" || vm.name.length === 0) {
           vm.missingName = true;
           return;
         }

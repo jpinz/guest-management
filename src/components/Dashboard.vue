@@ -83,8 +83,9 @@
       var eventsRef = db.ref('events/');
       eventsRef.on('value', function (snapshot) {
         let currEvents = snapshot.val();
+        let i = 0;
         for (let event in currEvents) {
-          vm.events.push({
+          vm.$set(vm.events, i, {
             id: event,
             name: currEvents[event].name,
             date: moment(currEvents[event].party_date).format("ddd, MMM Do YYYY"),
@@ -92,6 +93,7 @@
             maleGuests: currEvents[event].maleGuests,
             femaleGuests: currEvents[event].femaleGuests
           });
+          i++;
         }
       });
       db.ref('bros/' + vm.userId).once('value').then(function (snapshot) {

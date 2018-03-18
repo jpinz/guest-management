@@ -20,6 +20,11 @@
             Add Female(s)
           </button>
         </div>
+        <!--<div class="addGuest">
+          <button v-on:click='alertDefaultList' class="button is-warning" style="margin-left: 20px;">
+            Personal List
+          </button>
+        </div>-->
         <br/><br/><br/>
       </div>
       <div v-else>
@@ -378,6 +383,13 @@
             db.ref(addr + guest.id).remove();
           }
         }
+      },
+      alertDefaultList() {
+        this.$dialog.alert({
+          title: 'Manage Your List',
+          message: 'I have a title, a custom button and <b>HTML</b>!',
+          confirmText: 'Add Selected'
+        })
       },
       addMale: function (nameInput, checkedIn, addedByName, addedByUID) {
         this.input = '';
