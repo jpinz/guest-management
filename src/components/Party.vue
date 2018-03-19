@@ -4,7 +4,7 @@
     <h4 class="subtitle has-text-centered is-4">{{party_date}} - {{party_type}}</h4>
     <div class="field" id="center" v-if="social">
       <span>Front Door Mode enabled: </span>
-      <b-switch v-model="isFrontDoor">
+      <b-switch @input="frontDoor(isFrontDoor)" v-model="isFrontDoor">
       </b-switch>
     </div>
     <br/>
@@ -65,8 +65,14 @@
             <th>{{male.name}}</th>
             <td>{{male.addedByName}}</td>
             <td v-if="male.checkedIn == -1">
-              <button v-on:click="checkIn(male, true)" class="button is-info"
+              <button v-on:click="checkIn(male, true, false)" class="button is-info"
                       :disabled="social == false || !isFrontDoor">Check in
+              </button>
+            </td>
+            <td v-else-if="male.checkedIn != -1 && !isFrontDoor">
+              <button v-on:click="checkIn(male, true, true)" class="button is-danger"
+                      :disabled="social == false ">
+                {{male.checkedIn}}
               </button>
             </td>
             <td v-else><span class="tag is-info is-medium">{{male.checkedIn}}</span></td>
@@ -93,9 +99,15 @@
             <th>{{female.name}}</th>
             <td>{{female.addedByName}}</td>
             <td v-if="female.checkedIn == -1">
-              <button v-on:click="checkIn(female, false)" class="button is-danger"
+              <button v-on:click="checkIn(female, false, false)" class="button is-danger"
                       :disabled="social == false || !isFrontDoor">
                 Check in
+              </button>
+            </td>
+            <td v-else-if="female.checkedIn != -1 && !isFrontDoor">
+              <button v-on:click="checkIn(female, false, true)" class="button is-danger"
+                      :disabled="social == false ">
+                {{female.checkedIn}}
               </button>
             </td>
             <td v-else><span class="tag is-danger is-medium">{{female.checkedIn}}</span></td>
@@ -107,6 +119,8 @@
         </table>
       </div>
     </div>
+
+
     <!-- APPROVAL LIST -->
     <div class="columns">
       <div class="column is-half">
@@ -166,6 +180,7 @@
 <script>
   import firebase from 'firebase'
   import moment from 'moment'
+  import 'howler'
 
   export default {
     data() {
@@ -334,14 +349,34 @@
       capitalize: function (str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
       },
-      checkIn: function (guest, isMale) {
+      frontDoor: function (frontDoor) {
+        if(frontDoor) {
+          var sound = new Howl({
+            src: ['../../static/music.mp3'],
+            sprite: {
+              intro: [0, 7360]
+            }
+          });
+          sound.play('intro');
+        }
+
+      },
+      checkIn: function (guest, isMale, checkOut) {
         this.input = '';
         let db = firebase.database();
         let d = new Date();
-        if (isMale) {
-          db.ref('events/' + this.$route.params.id + '/males/' + guest.id).update({'checkedIn': d.getTime()});
+        if(checkOut) {
+          if (isMale) {
+            db.ref('events/' + this.$route.params.id + '/males/' + guest.id).update({'checkedIn': -1});
+          } else {
+            db.ref('events/' + this.$route.params.id + '/females/' + guest.id).update({'checkedIn': -1});
+          }
         } else {
-          db.ref('events/' + this.$route.params.id + '/females/' + guest.id).update({'checkedIn': d.getTime()});
+          if (isMale) {
+            db.ref('events/' + this.$route.params.id + '/males/' + guest.id).update({'checkedIn': d.getTime()});
+          } else {
+            db.ref('events/' + this.$route.params.id + '/females/' + guest.id).update({'checkedIn': d.getTime()});
+          }
         }
         document.getElementById("searchbar").focus();
 
@@ -519,4 +554,6 @@
     margin: 0 auto;
     width: 50%;
   }
+
+
 </style>
