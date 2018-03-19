@@ -34,13 +34,19 @@
 
       <label class="label">Number of Male Guests per Brother</label>
       <div class="control">
-        <input v-model="maleGuestCount" class="input" type="number" placeholder="Number">
+        <input v-model="maleGuestCount" class="input" type="number" :disabled="generalGuestCount != 0" placeholder="Number">
       </div>
 
       <label class="label">Number of Female Guests per Brother</label>
       <div class="control">
-        <input v-model="femaleGuestCount" class="input" type="Number" placeholder="Number">
+        <input v-model="femaleGuestCount" class="input" type="Number" :disabled="generalGuestCount != 0" placeholder="Number">
       </div>
+
+      <label class="label">Number of General Guests per Brother</label>
+      <div class="control">
+        <input v-model="generalGuestCount" class="input" type="Number" placeholder="Number">
+      </div>
+      <p>Use General guests and leave Males and Females at 0 for just a general guest count that disregards gender.</p>
       <br/>
       <button v-if="party_id" v-on:click='addParty'
               class="button is-link">Edit Event
@@ -70,7 +76,8 @@
         type: 'social',
         party_date: new Date(),
         maleGuestCount: 0,
-        femaleGuestCount: 0
+        femaleGuestCount: 0,
+        generalGuestCount: 0
       }
     },
     created() {
@@ -107,23 +114,41 @@
 
         if (vm.party_id) {
           console.log("Updating party: " + vm.party_id);
-          db.ref('events/' + vm.party_id).update({
-            name: vm.name,
-            type: vm.type,
-            maleGuests: parseInt(vm.maleGuestCount),
-            femaleGuests: parseInt(vm.femaleGuestCount),
-            party_date: vm.party_date.getTime()
-          });
+          if(vm.generalGuestCount !== 0 && vm.maleGuestCount === 0 && vm.femaleGuestCount === 0) {
+            db.ref('events/' + vm.party_id).update({
+              name: vm.name,
+              type: vm.type,
+              generalGuests: parseInt(vm.generalGuestCount),
+              party_date: vm.party_date.getTime()
+            });
+          } else {
+            db.ref('events/' + vm.party_id).update({
+              name: vm.name,
+              type: vm.type,
+              maleGuests: parseInt(vm.maleGuestCount),
+              femaleGuests: parseInt(vm.femaleGuestCount),
+              party_date: vm.party_date.getTime()
+            });
+          }
           this.$router.push({path: `/party/${vm.party_id}`});
         } else {
           let newEventId = db.ref().push().key;
-          db.ref('events/' + newEventId).set({
-            name: vm.name,
-            type: vm.type,
-            maleGuests: parseInt(vm.maleGuestCount),
-            femaleGuests: parseInt(vm.femaleGuestCount),
-            party_date: vm.party_date.getTime()
-          });
+          if(vm.generalGuestCount !== 0 && vm.maleGuestCount === 0 && vm.femaleGuestCount === 0) {
+            db.ref('events/' + newEventId).set({
+              name: vm.name,
+              type: vm.type,
+              generalGuests: parseInt(vm.generalGuestCount),
+              party_date: vm.party_date.getTime()
+            });
+          } else {
+            db.ref('events/' + newEventId).set({
+              name: vm.name,
+              type: vm.type,
+              maleGuests: parseInt(vm.maleGuestCount),
+              femaleGuests: parseInt(vm.femaleGuestCount),
+              party_date: vm.party_date.getTime()
+            });
+          }
           this.$router.push({path: `/party/${newEventId}`});
         }
       },

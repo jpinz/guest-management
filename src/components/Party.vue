@@ -9,7 +9,7 @@
     </div>
     <br/>
     <div class="field">
-      <div v-if="(paid_bill && !party_closed) || !social" class="control">
+      <div v-if="(paid_bill && !party_closed) || social" class="control">
         <input v-model="input" class="input" type="text" placeholder="Enter guest name(s)" id="searchbar">
         <br/>
         <div class="addGuest">
@@ -41,8 +41,10 @@
       </div>
       <p>There are <strong>{{females.length}}</strong> females and <strong>{{males.length}}</strong>
         males on the list. For you math majors that is <strong>{{females.length + males.length}}</strong> guests.</p>
-      <p>You have added <strong>{{femalesAdded}}/{{femaleLimit}}</strong> females and <strong>{{malesAdded}}/{{maleLimit}}</strong>
+      <p v-if="generalLimit == 0 || !generalLimit">You have added <strong>{{femalesAdded}}/{{femaleLimit}}</strong> females and <strong>{{malesAdded}}/{{maleLimit}}</strong>
         males for a total of <strong>{{malesAdded + femalesAdded}}</strong> added.</p>
+      <p v-else>You have added <strong>{{femalesAdded}}</strong> females and <strong>{{malesAdded}}</strong>
+        males for a total of <strong>{{malesAdded + femalesAdded}}/{{generalLimit}}</strong> added.</p>
       <p>There are <strong>{{checkedIn}}</strong> guests who have checked in.</p>
     </div>
 
@@ -188,8 +190,10 @@
         checkedIn: 0,
         maleLimit: '',
         femaleLimit: '',
+        generalLimit: '',
         malesAdded: 0,
-        femalesAdded: 0
+        femalesAdded: 0,
+        generalAdded: 0
       }
     },
     created() {
@@ -212,6 +216,7 @@
         vm.party_closed = event.closed;
         (event.maleGuests !== -1 ) ? vm.maleLimit = event.maleGuests : vm.maleLimit = '∞';
         (event.femaleGuests !== -1 ) ? vm.femaleLimit = event.femaleGuests : vm.femaleLimit = '∞';
+        (event.generalGuests !== -1 ) ? vm.generalLimit = event.generalGuests : vm.generalLimit= '∞';
       });
 
       const blacklistRef = db.ref('blacklist/');
@@ -240,6 +245,7 @@
           i++;
         });
         vm.malesAdded = count;
+        vm.generalAdded += count;
       });
 
       const malesApprovalRef = db.ref('events/' + this.$route.params.id + '/males_approval');
@@ -275,6 +281,7 @@
           i++;
         });
         vm.femalesAdded = count;
+        vm.generalAdded += count;
       });
 
       const femalesApprovalRef = db.ref('events/' + this.$route.params.id + '/females_approval');
@@ -417,7 +424,9 @@
           } else if (!name || name === undefined || name === "" || name.length === 0) {
             console.log("Name was empty, didn't add");
           } else {
-            if (vm.malesAdded >= vm.maleLimit && !vm.social) {
+            console.log(vm.generalAdded + " " + vm.generalLimit);
+
+            if ((vm.malesAdded >= vm.maleLimit || vm.generalAdded >= vm.generalLimit) && !vm.social) {
               hitLimit = true;
               let newMaleId = db.ref().push().key;
               let sortKeyArr = name.split(' ');
@@ -468,7 +477,7 @@
           } else if (!name || name === undefined || name === "" || name.length === 0) {
             console.log("Name was empty, didn't add");
           } else {
-            if (vm.femalesAdded >= vm.femaleLimit && !vm.social) {
+            if ((vm.femalesAdded >= vm.femaleLimit || vm.generalAdded >= vm.generalLimit) && !vm.social) {
               hitLimit = true;
               let newFemaleId = db.ref().push().key;
               let sortKeyArr = name.split(' ');
