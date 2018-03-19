@@ -44,7 +44,7 @@
         <th>
           <router-link :to="`/party/${event.id}`">{{event.name}}</router-link>
         </th>
-        <td>{{event.type}}</td>
+        <td>{{capitalize(event.type)}}</td>
         <td>{{event.date}}</td>
       </tr>
       </tbody>
