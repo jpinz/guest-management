@@ -393,18 +393,11 @@
             db.ref(addr + guest.id).remove();
           } else {
             let addr = 'events/' + this.$route.params.id + '/females/';
-            this.males.splice(index, 1);
+            this.females.splice(index, 1);
 
             db.ref(addr + guest.id).remove();
           }
         }
-      },
-      alertDefaultList() {
-        this.$dialog.alert({
-          title: 'Manage Your List',
-          message: 'I have a title, a custom button and <b>HTML</b>!',
-          confirmText: 'Add Selected'
-        })
       },
       addMale: function (nameInput, checkedIn, addedByName, addedByUID) {
         this.input = '';
