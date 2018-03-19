@@ -93,6 +93,8 @@
           vm.name = event.name;
           (event.maleGuests !== -1 ) ? vm.maleGuestCount = event.maleGuests : vm.maleGuestCount = -1;
           (event.femaleGuests !== -1 ) ? vm.femaleGuestCount = event.femaleGuests : vm.femaleGuestCount = -1;
+          (event.generalGuests !== -1 ) ? vm.generalGuestCount = event.generalGuests : vm.generalGuestCount = -1;
+
         });
 
       }
@@ -114,7 +116,7 @@
 
         if (vm.party_id) {
           console.log("Updating party: " + vm.party_id);
-          if(vm.generalGuestCount !== 0 && vm.maleGuestCount === 0 && vm.femaleGuestCount === 0) {
+          if(vm.generalGuestCount !== 0) {
             db.ref('events/' + vm.party_id).update({
               name: vm.name,
               type: vm.type,

@@ -5,12 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="60d01091-1b86-4264-b345-3e71dffddfca" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/index.html" afterPath="$PROJECT_DIR$/dist/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/static/js/manifest.2ae2e69a05c33dfc65f8.js.map" afterPath="$PROJECT_DIR$/dist/static/js/manifest.2ae2e69a05c33dfc65f8.js.map" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/components/CreateParty.vue" afterPath="$PROJECT_DIR$/src/components/CreateParty.vue" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/components/Dashboard.vue" afterPath="$PROJECT_DIR$/src/components/Dashboard.vue" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/components/Party.vue" afterPath="$PROJECT_DIR$/src/components/Party.vue" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -59,8 +54,8 @@
       <file leaf-file-name="CreateParty.vue" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/components/CreateParty.vue">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2310">
-              <caret line="41" column="105" lean-forward="false" selection-start-line="41" selection-start-column="105" selection-end-line="41" selection-end-column="105" />
+            <state relative-caret-position="528">
+              <caret line="118" column="39" lean-forward="false" selection-start-line="118" selection-start-column="39" selection-end-line="118" selection-end-column="39" />
               <folding />
             </state>
           </provider>
@@ -196,9 +191,9 @@
         <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/src/main.js" />
         <option value="$PROJECT_DIR$/server.js" />
-        <option value="$PROJECT_DIR$/src/components/CreateParty.vue" />
         <option value="$PROJECT_DIR$/src/components/Party.vue" />
         <option value="$PROJECT_DIR$/src/components/Dashboard.vue" />
+        <option value="$PROJECT_DIR$/src/components/CreateParty.vue" />
       </list>
     </option>
   </component>
@@ -337,8 +332,8 @@
     </list>
     <recent_temporary>
       <list size="4">
-        <item index="0" class="java.lang.String" itemvalue="npm.build" />
-        <item index="1" class="java.lang.String" itemvalue="npm.startLocal" />
+        <item index="0" class="java.lang.String" itemvalue="npm.startLocal" />
+        <item index="1" class="java.lang.String" itemvalue="npm.build" />
         <item index="2" class="java.lang.String" itemvalue="npm.start" />
         <item index="3" class="java.lang.String" itemvalue="Node.js.index.js" />
       </list>
@@ -384,7 +379,7 @@
       <workItem from="1520896253354" duration="31608000" />
       <workItem from="1520998343975" duration="21278000" />
       <workItem from="1521173121081" duration="4248000" />
-      <workItem from="1521212844977" duration="41698000" />
+      <workItem from="1521212844977" duration="42117000" />
     </task>
     <task id="LOCAL-00001" summary="A lot of changes to the app. No more dashboard. Making progress.">
       <created>1516580583907</created>
@@ -453,7 +448,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="238129000" />
+    <option name="totallyTimeSpent" value="238548000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-13" y="-13" width="3026" height="1946" extended-state="6" />
@@ -798,8 +793,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/components/CreateParty.vue">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2310">
-          <caret line="41" column="105" lean-forward="false" selection-start-line="41" selection-start-column="105" selection-end-line="41" selection-end-column="105" />
+        <state relative-caret-position="528">
+          <caret line="118" column="39" lean-forward="false" selection-start-line="118" selection-start-column="39" selection-end-line="118" selection-end-column="39" />
           <folding />
         </state>
       </provider>
