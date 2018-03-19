@@ -9,7 +9,7 @@
     </div>
     <br/>
     <div class="field">
-      <div v-if="paid_bill" class="control">
+      <div v-if="(paid_bill && !party_closed) || !social" class="control">
         <input v-model="input" class="input" type="text" placeholder="Enter guest name(s)" id="searchbar">
         <br/>
         <div class="addGuest">
@@ -26,6 +26,12 @@
           </button>
         </div>-->
         <br/><br/><br/>
+      </div>
+      <div v-else-if="party_closed">
+        <div class="notification is-danger">
+          The party list is now closed, sorry!
+        </div>
+        <br/>
       </div>
       <div v-else>
         <div class="notification is-danger">
@@ -172,6 +178,7 @@
         party_id: this.$route.params.id.toString(),
         party_date: '',
         party_type: '',
+        party_closed: false,
         input: '',
         blacklist: [],
         males: [],
@@ -202,6 +209,7 @@
         vm.party_type = this.capitalize(event.type);
         vm.party_date = moment(event.party_date).format("ddd, MMM Do YYYY");
         vm.party_name = event.name;
+        vm.party_closed = event.closed;
         (event.maleGuests !== -1 ) ? vm.maleLimit = event.maleGuests : vm.maleLimit = '∞';
         (event.femaleGuests !== -1 ) ? vm.femaleLimit = event.femaleGuests : vm.femaleLimit = '∞';
       });
@@ -210,7 +218,7 @@
       blacklistRef.on('value', (snapshot) => {
         let i = 0;
         snapshot.forEach(function (child) {
-          vm.$set(vm.blacklist, i, child.val().name);
+          vm.$set(vm.blacklist, i, child.val().name.toLowerCase());
           i++;
         });
       });
@@ -402,9 +410,9 @@
         names.every(function (name) {
           name = name.replace(/[~!@#$%^&*()_|+\-=?;:",.<>\{\}\[\]\\\/]/gi, '').replace(/[0-9]/g, '').trim();
 
-          if (vm.blacklist.includes(name)) {
+          if (vm.blacklist.includes(name.toLowerCase())) {
             alert(name + " is on the blacklist! They will not be added to the guest list.");
-          } else if (vm.males.some(e => e.name === name)) {
+          } else if (vm.males.some(e => e.name.toLowerCase() === name.toLowerCase())) {
             console.log(name + " has already been added.");
           } else if (!name || name === undefined || name === "" || name.length === 0) {
             console.log("Name was empty, didn't add");
@@ -453,9 +461,9 @@
         names.every(function (name) {
           name = name.replace(/[~!@#$%^&*()_|+\-=?;:",.<>\{\}\[\]\\\/]/gi, '').replace(/[0-9]/g, '');
 
-          if (vm.blacklist.includes(name)) {
+          if (vm.blacklist.includes(name.toLowerCase())) {
             alert(name + " is on the blacklist! They will not be added to the guest list.");
-          } else if (vm.females.some(e => e.name === name)) {
+          } else if (vm.females.some(e => e.name.toLowerCase() === name.toLowerCase())) {
             console.log(name + " has already been added.");
           } else if (!name || name === undefined || name === "" || name.length === 0) {
             console.log("Name was empty, didn't add");

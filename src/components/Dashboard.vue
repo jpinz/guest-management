@@ -9,6 +9,7 @@
           <th>Name</th>
           <th>Type</th>
           <th>Date</th>
+          <th>Close</th>
           <th>Modify</th>
         </tr>
         </thead>
@@ -19,6 +20,9 @@
           </th>
           <td>{{capitalize(event.type)}}</td>
           <td>{{event.date}}</td>
+          <td>
+            <b-switch @input="close(event.id, event.closed)" v-model="event.closed"></b-switch>
+          </td>
           <th>
             <router-link :to="`/createParty?edit=${event.id}`">Edit</router-link>
           </th>
@@ -90,8 +94,7 @@
             name: currEvents[event].name,
             date: moment(currEvents[event].party_date).format("ddd, MMM Do YYYY"),
             type: currEvents[event].type,
-            maleGuests: currEvents[event].maleGuests,
-            femaleGuests: currEvents[event].femaleGuests
+            closed: currEvents[event].closed
           });
           i++;
         }
@@ -106,6 +109,11 @@
     methods: {
       capitalize: function (str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
+      },
+      close: function (id, closed) {
+        firebase.database().ref('events/' + id).update({
+          closed: closed
+        });
       }
     }
   }
