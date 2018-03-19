@@ -5,7 +5,7 @@
     <input v-model="input" class="input" type="text" placeholder="Enter name">
     <br/>
     <div class="addGuest">
-      <button v-on:click='addToBlackList(input, name, userId)' class="button is-danger">Add to Blacklst</button>
+      <button v-on:click='addToBlackList(input, name, userId)' class="button is-danger" :disabled="role === 'risk'">Add to Blacklst</button>
     </div>
 
     <table class="table is-fullwidth is-striped">

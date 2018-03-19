@@ -9,14 +9,26 @@
     </div>
     <br/>
     <div class="field">
-      <div v-if="(paid_bill && !party_closed) || social" class="control">
+      <div class="control">
+        <div v-if="party_closed">
+          <div class="notification is-danger">
+            The party list is now closed, sorry!
+          </div>
+          <br/>
+        </div>
+        <div v-else-if="!paid_bill">
+          <div class="notification is-danger">
+            You have not paid your social bill! Please talk to social about this.
+          </div>
+          <br/>
+        </div>
         <input v-model="input" class="input" type="text" placeholder="Enter guest name(s)" id="searchbar">
         <br/>
         <div class="addGuest">
-          <button v-on:click='addMale(input , -1, name, userId)' class="button is-info">Add Male(s)</button>
+          <button v-on:click='addMale(input , -1, name, userId)' class="button is-info" :disabled="(!paid_bill || party_closed) && !social">Add Male(s)</button>
         </div>
         <div class="addGuest">
-          <button v-on:click='addFemale(input, -1, name, userId)' class="button is-danger" style="margin-left: 20px;">
+          <button v-on:click='addFemale(input, -1, name, userId)' class="button is-danger" :disabled="(!paid_bill || party_closed) && !social" style="margin-left: 20px;">
             Add Female(s)
           </button>
         </div>
@@ -26,18 +38,6 @@
           </button>
         </div>-->
         <br/><br/><br/>
-      </div>
-      <div v-else-if="party_closed">
-        <div class="notification is-danger">
-          The party list is now closed, sorry!
-        </div>
-        <br/>
-      </div>
-      <div v-else>
-        <div class="notification is-danger">
-          You have not paid your social bill! Please talk to social about this.
-        </div>
-        <br/>
       </div>
       <p>There are <strong>{{females.length}}</strong> females and <strong>{{males.length}}</strong>
         males on the list. For you math majors that is <strong>{{females.length + males.length}}</strong> guests.</p>

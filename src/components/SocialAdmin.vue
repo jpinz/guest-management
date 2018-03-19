@@ -24,6 +24,7 @@
             <select v-model="bro.role" @change="update('role', bro.id, bro.role)">
               <option value="admin">Admin</option>
               <option value="social">Social</option>
+              <option value="risk">Risk Manager</option>
               <option value="normal">Normal</option>
             </select>
           </div>
