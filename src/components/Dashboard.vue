@@ -7,6 +7,7 @@
         <thead>
         <tr>
           <th>Name</th>
+          <th>Guests</th>
           <th>Type</th>
           <th>Date</th>
           <th>Close</th>
@@ -18,6 +19,7 @@
           <th>
             <router-link :to="`/party/${event.id}` ">[{{event.type.toUpperCase()}}] {{event.name}}</router-link>
           </th>
+          <td>{{event.total}}</td>
           <td>{{capitalize(event.type)}}</td>
           <td>{{event.date}}</td>
           <td>
@@ -35,6 +37,7 @@
       <thead>
       <tr>
         <th>Name</th>
+        <th>Guests</th>
         <th>Type</th>
         <th>Date</th>
       </tr>
@@ -42,8 +45,9 @@
       <tbody>
       <tr v-for="event in events">
         <th>
-          <router-link :to="`/party/${event.id}`">{{event.name}}</router-link>
+          <router-link :to="`/party/${event.id}`">[{{event.type.toUpperCase()}}] {{event.name}}</router-link>
         </th>
+        <td>{{event.total}}</td>
         <td>{{capitalize(event.type)}}</td>
         <td>{{event.date}}</td>
       </tr>
@@ -94,6 +98,7 @@
             name: currEvents[event].name,
             date: moment(currEvents[event].party_date).format("ddd, MMM Do YYYY"),
             type: currEvents[event].type,
+            total: Object.keys(currEvents[event].males).length + Object.keys(currEvents[event].females).length,
             closed: currEvents[event].closed
           });
           i++;

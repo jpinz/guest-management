@@ -32,11 +32,6 @@
             Add Female(s)
           </button>
         </div>
-        <!--<div class="addGuest">
-          <button v-on:click='alertDefaultList' class="button is-warning" style="margin-left: 20px;">
-            Personal List
-          </button>
-        </div>-->
         <br/><br/><br/>
       </div>
       <p>There are <strong>{{females.length}}</strong> females and <strong>{{males.length}}</strong>
@@ -260,7 +255,8 @@
           i++;
         });
         vm.malesAdded = count;
-        vm.generalAdded += count;
+        vm.generalAdded = vm.malesAdded + vm.femalesAdded;
+
       });
 
       const malesApprovalRef = db.ref('events/' + this.$route.params.id + '/males_approval');
@@ -296,7 +292,7 @@
           i++;
         });
         vm.femalesAdded = count;
-        vm.generalAdded += count;
+        vm.generalAdded = vm.malesAdded + vm.femalesAdded;
       });
 
       const femalesApprovalRef = db.ref('events/' + this.$route.params.id + '/females_approval');
@@ -321,6 +317,7 @@
 
         vm.paid_bill = snapshot.val() && snapshot.val().paid_bill === true;
       });
+
 
     },
     computed: {
