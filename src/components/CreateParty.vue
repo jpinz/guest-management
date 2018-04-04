@@ -140,7 +140,8 @@
               name: vm.name,
               type: vm.type,
               generalGuests: parseInt(vm.generalGuestCount),
-              party_date: vm.party_date.getTime()
+              party_date: vm.party_date.getTime(),
+              closed: false
             });
           } else {
             db.ref('events/' + newEventId).set({
@@ -148,7 +149,8 @@
               type: vm.type,
               maleGuests: parseInt(vm.maleGuestCount),
               femaleGuests: parseInt(vm.femaleGuestCount),
-              party_date: vm.party_date.getTime()
+              party_date: vm.party_date.getTime(),
+              closed: false
             });
           }
           this.$router.push({path: `/party/${newEventId}`});

@@ -98,7 +98,7 @@
             name: currEvents[event].name,
             date: moment(currEvents[event].party_date).format("ddd, MMM Do YYYY"),
             type: currEvents[event].type,
-            total: Object.keys(currEvents[event].males).length + Object.keys(currEvents[event].females).length,
+            total: (currEvents[event].males && currEvents[event].females) ? Object.keys(currEvents[event].males).length + Object.keys(currEvents[event].females).length : 0,
             closed: currEvents[event].closed
           });
           i++;
