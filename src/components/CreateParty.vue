@@ -110,7 +110,6 @@
           //(event.generalGuests !== -1 ) ? vm.generalGuestCount = event.generalGuests : vm.generalGuestCount = -1;
 
         });
-      console.log(vm);
       }
     },
     methods: {
@@ -177,9 +176,16 @@
         eventRef.once('value').then(function(snapshot) {
           let a = document.createElement("a");
           let file = new Blob([JSON.stringify(snapshot.val(), null, 2)], {type: "application/json"});
+          //Only save to firebase when deleting
+          /* let storageRef = firebase.storage().ref();
+          let dataRef = storageRef.child(vm.name.replace(" ", "_") + "_data.json");
+          dataRef.put(file).then(function(snapshot) {
+            console.log('Uploaded a blob or file!');
+          });*/
           a.href = URL.createObjectURL(file);
           a.download = vm.name.replace(" ", "_") + "_data.json";
           a.click();
+          alert("Will save a copy to the firebase storage when the party gets deleted.");
         });
       },
       remove: function () {
@@ -195,10 +201,17 @@
           eventRef.once('value').then(function(snapshot) {
             let a = document.createElement("a");
             let file = new Blob([JSON.stringify(snapshot.val(), null, 2)], {type: "application/json"});
+            let storageRef = firebase.storage().ref();
+            let dataRef = storageRef.child(vm.name.replace(" ", "_") + "_data.json");
+            dataRef.put(file).then(function(snapshot) {
+              console.log('Uploaded a blob or file!');
+            });
             a.href = URL.createObjectURL(file);
             a.download = vm.name.replace(" ", "_") + "_data.json";
             a.click();
+            alert("Also saved a copy to firebase hosting.");
           });
+
           db.ref('events/' + vm.party_id).remove();
           db.ref('bros/').once('value').then(function (snapshot) {
             for (let key in snapshot.val()) {
