@@ -55,6 +55,10 @@
               class="button is-link">Add Party
       </button>
       <br/><br/>
+      <button v-if="party_id" v-on:click='download'
+              class="button is-info">Download Event
+      </button>
+      <br/><br/>
       <button v-if="party_id" v-on:click='remove'
               class="button is-danger">Delete Event
       </button>
@@ -93,10 +97,20 @@
           vm.name = event.name;
           (event.maleGuests !== -1 ) ? vm.maleGuestCount = event.maleGuests : vm.maleGuestCount = -1;
           (event.femaleGuests !== -1 ) ? vm.femaleGuestCount = event.femaleGuests : vm.femaleGuestCount = -1;
-          (event.generalGuests !== -1 ) ? vm.generalGuestCount = event.generalGuests : vm.generalGuestCount = -1;
+          if(event.generalGuests) {
+            if(event.generalGuests !== -1) {
+              vm.generalGuestCount = event.generalGuests;
+            } else {
+              vm.generalGuestCount = -1;
+            }
+          } else {
+            vm.generalGuestCount = 0;
+          }
+          (event.generalGuests) ? vm.generalGuestCount = event.generalGuests : vm.generalGuestCount = 0;
+          //(event.generalGuests !== -1 ) ? vm.generalGuestCount = event.generalGuests : vm.generalGuestCount = -1;
 
         });
-
+      console.log(vm);
       }
     },
     methods: {
@@ -156,15 +170,35 @@
           this.$router.push({path: `/party/${newEventId}`});
         }
       },
+      download: function () {
+        let db = firebase.database();
+        let vm = this;
+        const eventRef = db.ref('events/' + vm.party_id);
+        eventRef.once('value').then(function(snapshot) {
+          let a = document.createElement("a");
+          let file = new Blob([JSON.stringify(snapshot.val(), null, 2)], {type: "application/json"});
+          a.href = URL.createObjectURL(file);
+          a.download = vm.name.replace(" ", "_") + "_data.json";
+          a.click();
+        });
+      },
       remove: function () {
         let db = firebase.database();
         let vm = this;
         let deletion = false;
 
-        if (confirm("Are you sure you want to delete this event?")) {
+        if (confirm("Are you sure you want to delete this event? (WILL DOWNLOAD LIST BEFORE DELETION)")) {
           deletion = true;
         }
         if (deletion) {
+          const eventRef = db.ref('events/' + vm.party_id);
+          eventRef.once('value').then(function(snapshot) {
+            let a = document.createElement("a");
+            let file = new Blob([JSON.stringify(snapshot.val(), null, 2)], {type: "application/json"});
+            a.href = URL.createObjectURL(file);
+            a.download = vm.name.replace(" ", "_") + "_data.json";
+            a.click();
+          });
           db.ref('events/' + vm.party_id).remove();
           db.ref('bros/').once('value').then(function (snapshot) {
             for (let key in snapshot.val()) {
