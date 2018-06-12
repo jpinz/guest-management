@@ -64,6 +64,11 @@
           vm.missingName = true;
           return;
         }
+        if (!vm.email.includes("wpi.edu")) {
+          alert("Please use your wpi.edu email");
+          vm.email = '';
+          return;
+        }
         firebase.auth()
           .createUserWithEmailAndPassword(this.email, this.password)
           .then(
