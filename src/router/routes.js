@@ -7,6 +7,7 @@ import Party from '../components/Party.vue';
 import CreateParty from '../components/CreateParty.vue';
 import SocialAdmin from '../components/SocialAdmin.vue';
 import Blacklist from '../components/Blacklist.vue';
+import UserList from '../components/UserList.vue';
 
 // This is where you add all your site routes
 // Each route is set as an object in the array
@@ -77,6 +78,14 @@ export const routes = [
     path: '/party/:id',
     name: 'party',
     component: Party,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/userlist',
+    name: 'userlist',
+    component: UserList,
     meta: {
       requiresAuth: true
     }

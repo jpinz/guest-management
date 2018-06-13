@@ -9,6 +9,7 @@
         <th>Paid Bill</th>
         <th>Role</th>
         <th v-if="role === 'admin'">Verify Account</th>
+        <th v-if="role === 'admin'">Delete User</th>
       </tr>
       </thead>
       <tbody>
@@ -34,6 +35,11 @@
           <span v-if="bro.verified === true" class="tag is-medium">Verified</span>
           <button v-if="bro.verified === false" v-on:click="update('verified', bro.id, true)" class="button is-primary">
             Verify
+          </button>
+        </td>
+        <td v-if="role === 'admin'">
+          <button v-on:click="remove(bro.id, bro.name)" class="button is-danger">
+            Delete
           </button>
         </td>
       </tr>
@@ -95,6 +101,17 @@
         firebase.database().ref('bros/' + id).update({
           [key]: value
         });
+      },
+      remove: function (id, name) {
+        let db = firebase.database();
+        let deletion = false;
+
+        if (confirm(`Are you sure you want to delete ${name}?`)) {
+          deletion = true;
+        }
+        if (deletion) {
+          //db.ref('bros/' + id).remove();
+        }
       }
     },
   };

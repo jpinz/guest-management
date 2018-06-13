@@ -47,6 +47,7 @@
         <input v-model="generalGuestCount" class="input" type="Number" placeholder="Number">
       </div>
       <p>Use General guests and leave Males and Females at 0 for just a general guest count that disregards gender.</p>
+      <p>Use -1 for infinite.</p>
       <br/>
       <button v-if="party_id" v-on:click='addParty'
               class="button is-link">Edit Event
@@ -177,11 +178,11 @@
           let a = document.createElement("a");
           let file = new Blob([JSON.stringify(snapshot.val(), null, 2)], {type: "application/json"});
           //Only save to firebase when deleting
-          /* let storageRef = firebase.storage().ref();
+          let storageRef = firebase.storage().ref();
           let dataRef = storageRef.child(vm.name.replace(" ", "_") + "_data.json");
           dataRef.put(file).then(function(snapshot) {
             console.log('Uploaded a blob or file!');
-          });*/
+          });
           a.href = URL.createObjectURL(file);
           a.download = vm.name.replace(" ", "_") + "_data.json";
           a.click();
