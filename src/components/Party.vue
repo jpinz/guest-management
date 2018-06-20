@@ -215,7 +215,6 @@
 <script>
   import firebase from 'firebase'
   import moment from 'moment'
-  import 'howler'
 
   export default {
     data() {
@@ -429,15 +428,8 @@
       },
       frontDoor: function (frontDoor) {
         if(frontDoor) {
-          /*var sound = new Howl({
-            src: ['../../static/music.mp3'],
-            sprite: {
-              intro: [0, 7360]
-            }
-          });
-          sound.play('intro');*/
-        }
 
+        }
       },
       checkIn: function (guest, isMale, checkOut) {
         this.input = '';
