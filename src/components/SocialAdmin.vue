@@ -110,7 +110,7 @@
           deletion = true;
         }
         if (deletion) {
-          //db.ref('bros/' + id).remove();
+          db.ref('bros/' + id).remove();
         }
       }
     },
