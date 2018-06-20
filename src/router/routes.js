@@ -18,8 +18,11 @@ export const routes = [
   //Redirects
   {path: '/party/account', redirect: '/account'},
   {path: '/party/social', redirect: '/social'},
+  {path: '/party/userlist', redirect: '/userlist'},
+
   {path: '/social/account', redirect: '/account'},
   {path: '/social/social', redirect: '/social'},
+  {path: '/social/userlist', redirect: '/userlist'},
 
   //Routes
   {

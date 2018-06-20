@@ -171,6 +171,7 @@
       },
       remove: function (guest, isMale, index, approvalList) {
         let db = firebase.database();
+        let vm = this;
         console.log("Removing guest: " + guest.name);
         if (isMale) {
           let addr = 'bros/' + vm.userId+ '/list/males/';
@@ -184,7 +185,7 @@
           db.ref(addr + guest.id).remove();
         }
       },
-      addMale: function (nameInput) {
+      addMale: function (nameInput, checkedIn, addedByName, addedByUID) {
         this.input = '';
         let vm = this;
         let names = nameInput.split(',');
@@ -207,13 +208,16 @@
             let sortKey = sortKeyArr.splice(1).join('') + sortKeyArr[0];
             db.ref(addr + '/' + newMaleId).set({
               name: name,
+              checkedIn: checkedIn,
+              addedByName: addedByName,
+              addedByUID: addedByUID,
               sortKey: sortKey
             });
           }
           return true;
         });
       },
-      addFemale: function (nameInput) {
+      addFemale: function (nameInput, checkedIn, addedByName, addedByUID) {
         this.input = '';
         let vm = this;
         let names = nameInput.split(',');
@@ -235,6 +239,9 @@
             let sortKey = sortKeyArr.splice(1).join('') + sortKeyArr[0];
             db.ref(addr + '/' + newFemaleId).set({
               name: name,
+              checkedIn: checkedIn,
+              addedByName: addedByName,
+              addedByUID: addedByUID,
               sortKey: sortKey
             });
           }

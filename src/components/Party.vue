@@ -115,7 +115,6 @@
       </div>
     </div>
 
-
     <!-- APPROVAL LIST -->
     <div class="columns">
       <div class="column is-half">
@@ -169,6 +168,47 @@
         </table>
       </div>
     </div>
+
+
+    <!-- PERSONAL LIST -->
+    <div class="columns">
+      <div class="column is-half">
+        <h4 class="title has-text-centered is-4">Your list of Males</h4>
+        <table class="table is-fullwidth">
+          <thead>
+          <tr>
+            <th>Name</th>
+            <th>Add</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="(male, index) in filteredMalesList" :key="male.id">
+            <th>{{male.name}}</th>
+            <td v-if="males.includes(male.id)">Test</td>
+            <td v-else><button v-on:click="add(male, true)" class="button is-info">Add to list</button></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="column is-half">
+        <h4 class="title has-text-centered is-4">Your list of Females</h4>
+        <table class="table is-fullwidth">
+          <thead>
+          <tr>
+            <th>Name</th>
+            <th>Add</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="(female, index) in filteredFemalesList" :key="female.id">
+            <th>{{female.name}}</th>
+            <td v-if="females.includes(female)">Test</td>
+            <td v-else><button v-on:click="add(female, false)" class="button is-danger">Add to list</button></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -197,6 +237,8 @@
         females: [],
         malesApproval: [],
         femalesApproval: [],
+        malesList: [],
+        femalesList: [],
         checkedIn: 0,
         maleLimit: '',
         femaleLimit: '',
@@ -256,7 +298,6 @@
         });
         vm.malesAdded = count;
         vm.generalAdded = vm.malesAdded + vm.femalesAdded;
-
       });
 
       const malesApprovalRef = db.ref('events/' + this.$route.params.id + '/males_approval');
@@ -273,6 +314,23 @@
           i++;
         });
       });
+
+      const malesListRef = db.ref('bros/' + vm.userId + '/list/males');
+      malesListRef.orderByChild('sortKey').on('value', (snapshot) => {
+        let i = 0;
+        snapshot.forEach(function (child) {
+          vm.$set(vm.malesList, i, {
+            id: child.key,
+            name: child.val().name,
+            checkedIn: (child.val().checkedIn === -1) ? -1 : moment(child.val().checkedIn).format("LTS"),
+            addedByName: child.val().addedByName,
+            addedByUID: child.val().addedByUID
+          });
+          i++;
+        });
+      });
+
+      console.log(vm.malesList);
 
       const femalesRef = db.ref('events/' + this.$route.params.id + '/females');
       femalesRef.orderByChild('sortKey').on('value', (snapshot) => {
@@ -309,6 +367,20 @@
           i++;
         });
       });
+      const femalesListRef = db.ref('bros/' + vm.userId + '/list/females');
+      femalesListRef.orderByChild('sortKey').on('value', (snapshot) => {
+        let i = 0;
+        snapshot.forEach(function (child) {
+          vm.$set(vm.femalesList, i, {
+            id: child.key,
+            name: child.val().name,
+            checkedIn: (child.val().checkedIn === -1) ? -1 : moment(child.val().checkedIn).format("LTS"),
+            addedByName: child.val().addedByName,
+            addedByUID: child.val().addedByUID
+          });
+          i++;
+        });
+      });
 
       db.ref('bros/' + vm.userId).once('value').then(function (snapshot) {
         if (snapshot.val() && (snapshot.val().role === "admin" || snapshot.val().role === "social")) {
@@ -317,7 +389,6 @@
 
         vm.paid_bill = snapshot.val() && snapshot.val().paid_bill === true;
       });
-
 
     },
     computed: {
@@ -339,6 +410,16 @@
       filteredFemalesApproval() {
         return this.femalesApproval.filter(female => {
           return (female.name.toLowerCase().indexOf(this.input.toLowerCase()) > -1) || (female.addedByName.toLowerCase().indexOf(this.input.toLowerCase()) > -1)
+        })
+      },
+      filteredMalesList() {
+        return this.malesList.filter(male => {
+          return (male.name.toLowerCase().indexOf(this.input.toLowerCase()) > -1)
+        })
+      },
+      filteredFemalesList() {
+        return this.femalesList.filter(female => {
+          return (female.name.toLowerCase().indexOf(this.input.toLowerCase()) > -1)
         })
       }
     },
@@ -399,6 +480,26 @@
             let female = snapshot.val();
             db.ref(addr + '/' + guest.id).set(female);
             db.ref(addr + '_approval/' + guest.id).remove();
+          });
+        }
+      },
+      add: function (guest, isMale) {
+        let db = firebase.database();
+        let vm = this;
+        console.log("adding: " + guest.name);
+        if (isMale) {
+          let addr = 'events/' + this.$route.params.id + '/males';
+
+          db.ref('bros/' + vm.userId+ '/list/males/' + guest.id).once("value", function (snapshot) {
+            let male = snapshot.val();
+            db.ref(addr + '/' + guest.id).set(male);
+          });
+        } else {
+          let addr = 'events/' + this.$route.params.id + '/females';
+
+          db.ref('bros/' + vm.userId+ '/list/females/' + guest.id).once("value", function (snapshot) {
+            let female = snapshot.val();
+            db.ref(addr + '/' + guest.id).set(female);
           });
         }
       },
