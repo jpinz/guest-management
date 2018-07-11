@@ -1,6 +1,6 @@
-# zm-parties
+# guest-management
 
-> ZM guest list management
+> Guest List management website for social events.
 
 ## Build Setup
 
@@ -9,13 +9,16 @@
 npm install
 
 # serve with hot reload at localhost:8080
-npm run dev
+npm run startLocal
 
 # build for production with minification
 npm run build
 
 # build for production and view the bundle analyzer report
 npm run build --report
+
+# serve the built application at localhost:5000 (only after build)
+npm run start
 
 # run unit tests
 npm run unit

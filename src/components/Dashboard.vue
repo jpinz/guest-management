@@ -10,6 +10,7 @@
           <th>Guests</th>
           <th>Type</th>
           <th>Date</th>
+          <th>Jobs</th>
           <th>Close</th>
           <th>Modify</th>
         </tr>
@@ -22,6 +23,9 @@
           <td>{{event.total}}</td>
           <td>{{capitalize(event.type)}}</td>
           <td>{{event.date}}</td>
+          <th>
+            <router-link class="button is-link" :to="`/partyJobs/${event.id}`">Jobs</router-link>
+          </th>
           <td>
             <b-switch @input="close(event.id, event.closed)" v-model="event.closed"></b-switch>
           </td>
@@ -40,6 +44,7 @@
         <th>Guests</th>
         <th>Type</th>
         <th>Date</th>
+        <th>Jobs</th>
       </tr>
       </thead>
       <tbody>
@@ -50,6 +55,9 @@
         <td>{{event.total}}</td>
         <td>{{capitalize(event.type)}}</td>
         <td>{{event.date}}</td>
+        <th>
+          <router-link class="button is-link" :to="`/partyJobs/${event.id}`">Jobs</router-link>
+        </th>
       </tr>
       </tbody>
     </table>

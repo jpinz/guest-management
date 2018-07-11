@@ -34,12 +34,14 @@
 
       <label class="label">Number of Male Guests per Brother</label>
       <div class="control">
-        <input v-model="maleGuestCount" class="input" type="number" :disabled="generalGuestCount != 0" placeholder="Number">
+        <input v-model="maleGuestCount" class="input" type="number" :disabled="generalGuestCount != 0"
+               placeholder="Number">
       </div>
 
       <label class="label">Number of Female Guests per Brother</label>
       <div class="control">
-        <input v-model="femaleGuestCount" class="input" type="Number" :disabled="generalGuestCount != 0" placeholder="Number">
+        <input v-model="femaleGuestCount" class="input" type="Number" :disabled="generalGuestCount != 0"
+               placeholder="Number">
       </div>
 
       <label class="label">Number of General Guests per Brother</label>
@@ -71,7 +73,7 @@
   import firebase from 'firebase'
 
   export default {
-    data() {
+    data () {
       return {
         userId: '',
         name: '',
@@ -80,63 +82,80 @@
         missingName: false,
         type: 'social',
         party_date: new Date(),
+        brothers: [],
+        risk: [],
         maleGuestCount: 0,
         femaleGuestCount: 0,
         generalGuestCount: 0
       }
     },
-    created() {
-      let db = firebase.database();
-      let vm = this;
+    created () {
+      let db = firebase.database()
+      let vm = this
+
+      db.ref('bros/').orderByChild('sortKey').on('value', (snapshot) => {
+        let i = 0
+        let k = 0
+        snapshot.forEach(function (child) {
+          if (child.val().role === "risk") {
+            console.log(child.val());
+            vm.$set(vm.risk, k, child.val().name)
+            k++
+          } else {
+            vm.$set(vm.brothers, i, child.val().name)
+            i++
+          }
+        })
+      })
 
       if (vm.party_id) {
-        const eventRef = db.ref('events/' + vm.party_id);
+        const eventRef = db.ref('events/' + vm.party_id)
         eventRef.on('value', (snapshot) => {
-          let event = snapshot.val();
-          vm.type = event.type;
-          vm.party_date = new Date(event.party_date);
+          let event = snapshot.val()
+          vm.type = event.type
+          vm.party_date = new Date(event.party_date)
           vm.name = event.name;
           (event.maleGuests !== -1 ) ? vm.maleGuestCount = event.maleGuests : vm.maleGuestCount = -1;
-          (event.femaleGuests !== -1 ) ? vm.femaleGuestCount = event.femaleGuests : vm.femaleGuestCount = -1;
-          if(event.generalGuests) {
-            if(event.generalGuests !== -1) {
-              vm.generalGuestCount = event.generalGuests;
+          (event.femaleGuests !== -1 ) ? vm.femaleGuestCount = event.femaleGuests : vm.femaleGuestCount = -1
+          if (event.generalGuests) {
+            if (event.generalGuests !== -1) {
+              vm.generalGuestCount = event.generalGuests
             } else {
-              vm.generalGuestCount = -1;
+              vm.generalGuestCount = -1
             }
           } else {
-            vm.generalGuestCount = 0;
+            vm.generalGuestCount = 0
           }
-          (event.generalGuests) ? vm.generalGuestCount = event.generalGuests : vm.generalGuestCount = 0;
+          (event.generalGuests) ? vm.generalGuestCount = event.generalGuests : vm.generalGuestCount = 0
           //(event.generalGuests !== -1 ) ? vm.generalGuestCount = event.generalGuests : vm.generalGuestCount = -1;
 
-        });
+        })
       }
     },
     methods: {
       addParty: function () {
-        let db = firebase.database();
-        let vm = this;
+        let db = firebase.database()
+        let vm = this
 
-        if (!vm.name || vm.name === undefined || vm.name === "" || vm.name.length === 0) {
-          vm.missingName = true;
-          return;
+        if (!vm.name || vm.name === undefined || vm.name === '' || vm.name.length === 0) {
+          vm.missingName = true
+          return
         }
-        if (vm.type === "pregame") {
-          vm.party_date.setHours(21);
+        if (vm.type === 'pregame') {
+          vm.party_date.setHours(21)
         } else {
-          vm.party_date.setHours(22);
+          vm.party_date.setHours(22)
         }
 
         if (vm.party_id) {
-          console.log("Updating party: " + vm.party_id);
-          if(vm.generalGuestCount !== 0) {
+          console.log('Updating party: ' + vm.party_id)
+          if (vm.generalGuestCount !== 0) {
             db.ref('events/' + vm.party_id).update({
               name: vm.name,
               type: vm.type,
               generalGuests: parseInt(vm.generalGuestCount),
               party_date: vm.party_date.getTime()
-            });
+            })
           } else {
             db.ref('events/' + vm.party_id).update({
               name: vm.name,
@@ -144,19 +163,19 @@
               maleGuests: parseInt(vm.maleGuestCount),
               femaleGuests: parseInt(vm.femaleGuestCount),
               party_date: vm.party_date.getTime()
-            });
+            })
           }
-          this.$router.push({path: `/party/${vm.party_id}`});
+          this.$router.push({path: `/party/${vm.party_id}`})
         } else {
-          let newEventId = db.ref().push().key;
-          if(vm.generalGuestCount !== 0 && vm.maleGuestCount === 0 && vm.femaleGuestCount === 0) {
+          let newEventId = db.ref().push().key
+          if (vm.generalGuestCount !== 0 && vm.maleGuestCount === 0 && vm.femaleGuestCount === 0) {
             db.ref('events/' + newEventId).set({
               name: vm.name,
               type: vm.type,
               generalGuests: parseInt(vm.generalGuestCount),
               party_date: vm.party_date.getTime(),
               closed: false
-            });
+            })
           } else {
             db.ref('events/' + newEventId).set({
               name: vm.name,
@@ -164,65 +183,76 @@
               maleGuests: parseInt(vm.maleGuestCount),
               femaleGuests: parseInt(vm.femaleGuestCount),
               party_date: vm.party_date.getTime(),
+              jobs: {
+                'risk': vm.risk,
+                'shame': vm.brothers,
+                'jobs': {
+                  0:{time: 10},
+                  1:{time: 11},
+                  2:{time: 12},
+                  3:{time: 1}
+                }
+              },
               closed: false
-            });
+            })
           }
-          this.$router.push({path: `/party/${newEventId}`});
+
+          this.$router.push({path: `/party/${newEventId}`})
         }
       },
       download: function () {
-        let db = firebase.database();
-        let vm = this;
-        const eventRef = db.ref('events/' + vm.party_id);
-        eventRef.once('value').then(function(snapshot) {
-          let a = document.createElement("a");
-          let file = new Blob([JSON.stringify(snapshot.val(), null, 2)], {type: "application/json"});
+        let db = firebase.database()
+        let vm = this
+        const eventRef = db.ref('events/' + vm.party_id)
+        eventRef.once('value').then(function (snapshot) {
+          let a = document.createElement('a')
+          let file = new Blob([JSON.stringify(snapshot.val(), null, 2)], {type: 'application/json'})
           //Only save to firebase when deleting
-          let storageRef = firebase.storage().ref();
-          let dataRef = storageRef.child(vm.name.replace(" ", "_") + "_data.json");
-          dataRef.put(file).then(function(snapshot) {
-            console.log('Uploaded a blob or file!');
-          });
-          a.href = URL.createObjectURL(file);
-          a.download = vm.name.replace(" ", "_") + "_data.json";
-          a.click();
-          alert("Will save a copy to the firebase storage when the party gets deleted.");
-        });
+          let storageRef = firebase.storage().ref()
+          let dataRef = storageRef.child(vm.name.replace(' ', '_') + '_data.json')
+          dataRef.put(file).then(function (snapshot) {
+            console.log('Uploaded a blob or file!')
+          })
+          a.href = URL.createObjectURL(file)
+          a.download = vm.name.replace(' ', '_') + '_data.json'
+          a.click()
+          alert('Will save a copy to the firebase storage when the party gets deleted.')
+        })
       },
       remove: function () {
-        let db = firebase.database();
-        let vm = this;
-        let deletion = false;
+        let db = firebase.database()
+        let vm = this
+        let deletion = false
 
-        if (confirm("Are you sure you want to delete this event? (WILL DOWNLOAD LIST BEFORE DELETION)")) {
-          deletion = true;
+        if (confirm('Are you sure you want to delete this event? (WILL DOWNLOAD LIST BEFORE DELETION)')) {
+          deletion = true
         }
         if (deletion) {
-          const eventRef = db.ref('events/' + vm.party_id);
-          eventRef.once('value').then(function(snapshot) {
-            let a = document.createElement("a");
-            let file = new Blob([JSON.stringify(snapshot.val(), null, 2)], {type: "application/json"});
-            let storageRef = firebase.storage().ref();
-            let dataRef = storageRef.child(vm.name.replace(" ", "_") + "_data.json");
-            dataRef.put(file).then(function(snapshot) {
-              console.log('Uploaded a blob or file!');
-            });
-            a.href = URL.createObjectURL(file);
-            a.download = vm.name.replace(" ", "_") + "_data.json";
-            a.click();
-            alert("Also saved a copy to firebase hosting.");
-          });
+          const eventRef = db.ref('events/' + vm.party_id)
+          eventRef.once('value').then(function (snapshot) {
+            let a = document.createElement('a')
+            let file = new Blob([JSON.stringify(snapshot.val(), null, 2)], {type: 'application/json'})
+            let storageRef = firebase.storage().ref()
+            let dataRef = storageRef.child(vm.name.replace(' ', '_') + '_data.json')
+            dataRef.put(file).then(function (snapshot) {
+              console.log('Uploaded a blob or file!')
+            })
+            a.href = URL.createObjectURL(file)
+            a.download = vm.name.replace(' ', '_') + '_data.json'
+            a.click()
+            alert('Also saved a copy to firebase hosting.')
+          })
 
-          db.ref('events/' + vm.party_id).remove();
+          db.ref('events/' + vm.party_id).remove()
           db.ref('bros/').once('value').then(function (snapshot) {
             for (let key in snapshot.val()) {
-              db.ref('bros/' + key + '/events/' + vm.party_id).remove();
+              db.ref('bros/' + key + '/events/' + vm.party_id).remove()
             }
-          });
-          vm.$router.push({path: `/`});
+          })
+          vm.$router.push({path: `/`})
         }
       }
     },
-  };
+  }
 </script>
 
