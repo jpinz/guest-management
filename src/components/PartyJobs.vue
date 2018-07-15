@@ -9,7 +9,7 @@
       </div>
       <br/>
     </div>
-    <div v-if="!social">
+    <div>
       <div class="tile is-ancestor">
         <div class="tile is-parent">
           <article class="tile is-child box">
@@ -196,155 +196,155 @@
         </div>
       </div>
     </div>
-    <div v-else>
-      <div class="tile is-ancestor">
-        <div class="tile is-parent" @click="addMe('soberVolunteer')">
-          <article class="tile is-child box">
-            <p class="subtitle">Sober Volunteers</p>
-            <div class="tags">
-              <span v-for="(brother) in soberVolunteers" v-if="brother.name === name" :id="brother.id"
-                    class="tag is-medium is-info">{{brother.name}}</span>
-              <span v-else-if="brother.name !== name" class="tag is-medium" :id="brother.id">{{brother.name}}</span>
-            </div>
-          </article>
-        </div>
-        <div class="tile is-parent" @click="addMe('soberOfficer')">
-          <article class="tile is-child box">
-            <p class="subtitle">Sober Officers</p>
-            <div class="tags">
-              <span v-for="(brother) in soberOfficers" v-if="brother.name === name" :id="brother.id"
-                    class="tag is-medium is-info">{{brother.name}}</span>
-              <span v-else-if="brother.name !== name" class="tag is-medium" :id="brother.id">{{brother.name}}</span>
-            </div>
-          </article>
-        </div>
-        <div class="tile is-parent">
-          <article class="tile is-child box">
-            <p class="subtitle">Risk Managers</p>
-            <div class="tags">
-              <span v-for="(brother) in riskManagers" v-if="brother.name === name" :id="brother.id"
-                    class="tag is-medium is-info">{{brother.name}}</span>
-              <span v-else-if="brother.name !== name" class="tag is-medium" :id="brother.id">{{brother.name}}</span>
-            </div>
-          </article>
-        </div>
-      </div>
-      <table class="table is-bordered is-fullwidth">
-        <thead>
-        <tr>
-          <th>Time</th>
-          <th>Outside Front Door</th>
-          <th>Inside Front Door</th>
-          <th>Coat Room</th>
-          <th>Bar</th>
-          <th>Basement Back Door</th>
-          <th>Back Door</th>
-          <th>DJ</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="(job, key) in jobs" :key="key">
-          <th v-if="key == 0">10 PM</th>
-          <th v-if="key == 1">11 PM</th>
-          <th v-if="key == 2">12 AM</th>
-          <th v-if="key == 3">1 AM</th>
-          <td>
-            <div class="tags">
-              <span v-for="outsideFrontDoor in jobs[key]['outsideFrontDoor']" v-if="outsideFrontDoor.name === name"
-                    :id="outsideFrontDoor.id"
-                    class="tag is-info">{{outsideFrontDoor.name}}</span>
-              <span v-else-if="outsideFrontDoor.name !== name" class="tag"
-                    :id="outsideFrontDoor.id">{{outsideFrontDoor.name}}</span>
-            </div>
-          </td>
-          <td>
-            <div class="tags">
-              <span v-for="insideFrontDoor in jobs[key]['insideFrontDoor']" v-if="insideFrontDoor.name === name"
-                    :id="insideFrontDoor.id"
-                    class="tag is-info">{{insideFrontDoor.name}}</span>
-              <span v-else-if="insideFrontDoor.name !== name" class="tag"
-                    :id="insideFrontDoor.id">{{insideFrontDoor.name}}</span>
-            </div>
-          </td>
-          <td>
-            <div class="tags">
-              <span v-for="coatRoom in jobs[key]['coatRoom']" v-if="coatRoom.name === name" :id="coatRoom.id"
-                    class="tag is-info">{{coatRoom.name}}</span>
-              <span v-else-if="coatRoom.name !== name" class="tag" :id="coatRoom.id">{{coatRoom.name}}</span>
-            </div>
-          </td>
-          <td>
-            <div class="tags">
-              <span v-for="bar in jobs[key]['bar']" v-if="bar.name === name" :id="bar.id"
-                    class="tag is-info">{{bar.name}}</span>
-              <span v-else-if="bar.name !== name" class="tag" :id="bar.id">{{bar.name}}</span>
-            </div>
-          </td>
-          <td>
-            <div class="tags">
-              <span v-for="basementBackDoor in jobs[key]['basementBackDoor']" v-if="basementBackDoor.name === name"
-                    :id="basementBackDoor.id"
-                    class="tag is-info">{{basementBackDoor.name}}</span>
-              <span v-else-if="basementBackDoor.name !== name" class="tag"
-                    :id="basementBackDoor.id">{{basementBackDoor.name}}</span>
-            </div>
-          </td>
-          <td>
-            <div class="tags">
-              <span v-for="backDoor in jobs[key]['backDoor']" v-if="backDoor.name === name" :id="backDoor.id"
-                    class="tag is-info">{{backDoor.name}}</span>
-              <span v-else-if="backDoor.name !== name" class="tag" :id="backDoor.id">{{backDoor.name}}</span>
-            </div>
-          </td>
-          <td>
-            <div class="tags">
-              <span v-for="dj in jobs[key]['dj']" v-if="dj.name === name" :id="dj.id"
-                    class="tag is-info">{{dj.name}}</span>
-              <span v-else-if="dj.name !== name" class="tag" :id="dj.id">{{dj.name}}</span>
-            </div>
-          </td>
-        </tr>
-        </tbody>
-        <tfoot>
-        <tr>
-          <th>Needed brothers</th>
-          <th>
-            2
-          </th>
-          <th>
-            1
-          </th>
-          <th>
-            2 or 3
-          </th>
-          <th>
-            2
-          </th>
-          <th>
-            1
-          </th>
-          <th>
-            1
-          </th>
-          <th>
-            1
-          </th>
-        </tr>
-        </tfoot>
-      </table>
-      <div class="tile is-ancestor">
-        <div class="tile is-parent">
-          <article class="tile is-child notification is-danger">
-            <p class="subtitle">Wall of SHAME</p>
-            <div class="tags">
-              <span v-for="(brother) in shamedBrothers" v-if="brother.name === name" :id="brother.id"
-                    class="tag is-medium is-info">{{brother.name}}</span>
-              <span v-else-if="brother.name !== name" class="tag is-medium" :id="brother.id">{{brother.name}}</span>
-            </div>
-          </article>
-        </div>
-      </div>
-    </div>
+    <!--<div v-else>-->
+      <!--<div class="tile is-ancestor">-->
+        <!--<div class="tile is-parent" @click="addMe('soberVolunteer')">-->
+          <!--<article class="tile is-child box">-->
+            <!--<p class="subtitle">Sober Volunteers</p>-->
+            <!--<div class="tags">-->
+              <!--<span v-for="(brother) in soberVolunteers" v-if="brother.name === name" :id="brother.id"-->
+                    <!--class="tag is-medium is-info">{{brother.name}}</span>-->
+              <!--<span v-else-if="brother.name !== name" class="tag is-medium" :id="brother.id">{{brother.name}}</span>-->
+            <!--</div>-->
+          <!--</article>-->
+        <!--</div>-->
+        <!--<div class="tile is-parent" @click="addMe('soberOfficer')">-->
+          <!--<article class="tile is-child box">-->
+            <!--<p class="subtitle">Sober Officers</p>-->
+            <!--<div class="tags">-->
+              <!--<span v-for="(brother) in soberOfficers" v-if="brother.name === name" :id="brother.id"-->
+                    <!--class="tag is-medium is-info">{{brother.name}}</span>-->
+              <!--<span v-else-if="brother.name !== name" class="tag is-medium" :id="brother.id">{{brother.name}}</span>-->
+            <!--</div>-->
+          <!--</article>-->
+        <!--</div>-->
+        <!--<div class="tile is-parent">-->
+          <!--<article class="tile is-child box">-->
+            <!--<p class="subtitle">Risk Managers</p>-->
+            <!--<div class="tags">-->
+              <!--<span v-for="(brother) in riskManagers" v-if="brother.name === name" :id="brother.id"-->
+                    <!--class="tag is-medium is-info">{{brother.name}}</span>-->
+              <!--<span v-else-if="brother.name !== name" class="tag is-medium" :id="brother.id">{{brother.name}}</span>-->
+            <!--</div>-->
+          <!--</article>-->
+        <!--</div>-->
+      <!--</div>-->
+      <!--<table class="table is-bordered is-fullwidth">-->
+        <!--<thead>-->
+        <!--<tr>-->
+          <!--<th>Time</th>-->
+          <!--<th>Outside Front Door</th>-->
+          <!--<th>Inside Front Door</th>-->
+          <!--<th>Coat Room</th>-->
+          <!--<th>Bar</th>-->
+          <!--<th>Basement Back Door</th>-->
+          <!--<th>Back Door</th>-->
+          <!--<th>DJ</th>-->
+        <!--</tr>-->
+        <!--</thead>-->
+        <!--<tbody>-->
+        <!--<tr v-for="(job, key) in jobs" :key="key">-->
+          <!--<th v-if="key == 0">10 PM</th>-->
+          <!--<th v-if="key == 1">11 PM</th>-->
+          <!--<th v-if="key == 2">12 AM</th>-->
+          <!--<th v-if="key == 3">1 AM</th>-->
+          <!--<td>-->
+            <!--<div class="tags">-->
+              <!--<span v-for="outsideFrontDoor in jobs[key]['outsideFrontDoor']" v-if="outsideFrontDoor.name === name"-->
+                    <!--:id="outsideFrontDoor.id"-->
+                    <!--class="tag is-info">{{outsideFrontDoor.name}}</span>-->
+              <!--<span v-else-if="outsideFrontDoor.name !== name" class="tag"-->
+                    <!--:id="outsideFrontDoor.id">{{outsideFrontDoor.name}}</span>-->
+            <!--</div>-->
+          <!--</td>-->
+          <!--<td>-->
+            <!--<div class="tags">-->
+              <!--<span v-for="insideFrontDoor in jobs[key]['insideFrontDoor']" v-if="insideFrontDoor.name === name"-->
+                    <!--:id="insideFrontDoor.id"-->
+                    <!--class="tag is-info">{{insideFrontDoor.name}}</span>-->
+              <!--<span v-else-if="insideFrontDoor.name !== name" class="tag"-->
+                    <!--:id="insideFrontDoor.id">{{insideFrontDoor.name}}</span>-->
+            <!--</div>-->
+          <!--</td>-->
+          <!--<td>-->
+            <!--<div class="tags">-->
+              <!--<span v-for="coatRoom in jobs[key]['coatRoom']" v-if="coatRoom.name === name" :id="coatRoom.id"-->
+                    <!--class="tag is-info">{{coatRoom.name}}</span>-->
+              <!--<span v-else-if="coatRoom.name !== name" class="tag" :id="coatRoom.id">{{coatRoom.name}}</span>-->
+            <!--</div>-->
+          <!--</td>-->
+          <!--<td>-->
+            <!--<div class="tags">-->
+              <!--<span v-for="bar in jobs[key]['bar']" v-if="bar.name === name" :id="bar.id"-->
+                    <!--class="tag is-info">{{bar.name}}</span>-->
+              <!--<span v-else-if="bar.name !== name" class="tag" :id="bar.id">{{bar.name}}</span>-->
+            <!--</div>-->
+          <!--</td>-->
+          <!--<td>-->
+            <!--<div class="tags">-->
+              <!--<span v-for="basementBackDoor in jobs[key]['basementBackDoor']" v-if="basementBackDoor.name === name"-->
+                    <!--:id="basementBackDoor.id"-->
+                    <!--class="tag is-info">{{basementBackDoor.name}}</span>-->
+              <!--<span v-else-if="basementBackDoor.name !== name" class="tag"-->
+                    <!--:id="basementBackDoor.id">{{basementBackDoor.name}}</span>-->
+            <!--</div>-->
+          <!--</td>-->
+          <!--<td>-->
+            <!--<div class="tags">-->
+              <!--<span v-for="backDoor in jobs[key]['backDoor']" v-if="backDoor.name === name" :id="backDoor.id"-->
+                    <!--class="tag is-info">{{backDoor.name}}</span>-->
+              <!--<span v-else-if="backDoor.name !== name" class="tag" :id="backDoor.id">{{backDoor.name}}</span>-->
+            <!--</div>-->
+          <!--</td>-->
+          <!--<td>-->
+            <!--<div class="tags">-->
+              <!--<span v-for="dj in jobs[key]['dj']" v-if="dj.name === name" :id="dj.id"-->
+                    <!--class="tag is-info">{{dj.name}}</span>-->
+              <!--<span v-else-if="dj.name !== name" class="tag" :id="dj.id">{{dj.name}}</span>-->
+            <!--</div>-->
+          <!--</td>-->
+        <!--</tr>-->
+        <!--</tbody>-->
+        <!--<tfoot>-->
+        <!--<tr>-->
+          <!--<th>Needed brothers</th>-->
+          <!--<th>-->
+            <!--2-->
+          <!--</th>-->
+          <!--<th>-->
+            <!--1-->
+          <!--</th>-->
+          <!--<th>-->
+            <!--2 or 3-->
+          <!--</th>-->
+          <!--<th>-->
+            <!--2-->
+          <!--</th>-->
+          <!--<th>-->
+            <!--1-->
+          <!--</th>-->
+          <!--<th>-->
+            <!--1-->
+          <!--</th>-->
+          <!--<th>-->
+            <!--1-->
+          <!--</th>-->
+        <!--</tr>-->
+        <!--</tfoot>-->
+      <!--</table>-->
+      <!--<div class="tile is-ancestor">-->
+        <!--<div class="tile is-parent">-->
+          <!--<article class="tile is-child notification is-danger">-->
+            <!--<p class="subtitle">Wall of SHAME</p>-->
+            <!--<div class="tags">-->
+              <!--<span v-for="(brother) in shamedBrothers" v-if="brother.name === name" :id="brother.id"-->
+                    <!--class="tag is-medium is-info">{{brother.name}}</span>-->
+              <!--<span v-else-if="brother.name !== name" class="tag is-medium" :id="brother.id">{{brother.name}}</span>-->
+            <!--</div>-->
+          <!--</article>-->
+        <!--</div>-->
+      <!--</div>-->
+    <!--</div>-->
   </section>
 </template>
 
