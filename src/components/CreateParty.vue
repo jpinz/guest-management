@@ -51,6 +51,13 @@
       <p>Use General guests and leave Males and Females at 0 for just a general guest count that disregards gender.</p>
       <p>Use -1 for infinite.</p>
       <br/>
+      <label class="label">Party Jobs URL</label>
+      <div class="control">
+        <input v-model="jobsUrl" class="input" type="text"
+               placeholder="Jobs URL">
+      </div>
+      <p>Make sure <b>http://</b> or <b>https://</b> is at the beginning of the URL.</p>
+      <br/>
       <button v-if="party_id" v-on:click='addParty'
               class="button is-link">Edit Event
       </button>
@@ -77,6 +84,7 @@
       return {
         userId: '',
         name: '',
+        jobsUrl: '',
         email: '',
         party_id: this.$route.query.edit,
         missingName: false,
@@ -115,6 +123,7 @@
           vm.type = event.type
           vm.party_date = new Date(event.party_date)
           vm.name = event.name;
+          vm.jobsUrl = event.jobsUrl;
           (event.maleGuests !== -1 ) ? vm.maleGuestCount = event.maleGuests : vm.maleGuestCount = -1;
           (event.femaleGuests !== -1 ) ? vm.femaleGuestCount = event.femaleGuests : vm.femaleGuestCount = -1
           if (event.generalGuests) {
@@ -141,6 +150,10 @@
           vm.missingName = true
           return
         }
+        if (!vm.jobsUrl.startsWith("https://") && !vm.jobsUrl.startsWith("http://")) {
+          alert("You didn't start the url with http:// or https://");
+          return
+        }
         if (vm.type === 'pregame') {
           vm.party_date.setHours(21)
         } else {
@@ -154,7 +167,8 @@
               name: vm.name,
               type: vm.type,
               generalGuests: parseInt(vm.generalGuestCount),
-              party_date: vm.party_date.getTime()
+              party_date: vm.party_date.getTime(),
+              jobsUrl: vm.jobsUrl
             })
           } else {
             db.ref('events/' + vm.party_id).update({
@@ -162,7 +176,8 @@
               type: vm.type,
               maleGuests: parseInt(vm.maleGuestCount),
               femaleGuests: parseInt(vm.femaleGuestCount),
-              party_date: vm.party_date.getTime()
+              party_date: vm.party_date.getTime(),
+              jobsUrl: vm.jobsUrl
             })
           }
           this.$router.push({path: `/party/${vm.party_id}`})
@@ -174,6 +189,7 @@
               type: vm.type,
               generalGuests: parseInt(vm.generalGuestCount),
               party_date: vm.party_date.getTime(),
+              jobsUrl: vm.jobsUrl,
               closed: false
             })
           } else {
@@ -183,16 +199,7 @@
               maleGuests: parseInt(vm.maleGuestCount),
               femaleGuests: parseInt(vm.femaleGuestCount),
               party_date: vm.party_date.getTime(),
-              jobs: {
-                'risk': vm.risk,
-                'shame': vm.brothers,
-                'jobs': {
-                  0:{time: 10},
-                  1:{time: 11},
-                  2:{time: 12},
-                  3:{time: 1}
-                }
-              },
+              jobsUrl: vm.jobsUrl,
               closed: false
             })
           }

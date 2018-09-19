@@ -23,12 +23,13 @@
           <br/>
         </div>
         <input v-model="input" class="input" type="text" placeholder="Enter guest name(s)" id="searchbar">
+        <input v-if="isFrontDoor" v-model="brotherVouch" class="input" type="text" placeholder="Enter brother's name to vouch for them" id="brotherVouchBar">
         <br/>
         <div class="addGuest">
-          <button v-on:click='addMale(input , -1, name, userId)' class="button is-info" :disabled="(!paid_bill || party_closed) && !social">Add Male(s)</button>
+          <button v-on:click='addMale(input, brotherVouch, -1, name, userId)' class="button is-info" :disabled="(!paid_bill || party_closed) && !social">Add Male(s)</button>
         </div>
         <div class="addGuest">
-          <button v-on:click='addFemale(input, -1, name, userId)' class="button is-danger" :disabled="(!paid_bill || party_closed) && !social" style="margin-left: 20px;">
+          <button v-on:click='addFemale(input, brotherVouch, -1, name, userId)' class="button is-danger" :disabled="(!paid_bill || party_closed) && !social" style="margin-left: 20px;">
             Add Female(s)
           </button>
         </div>
@@ -449,8 +450,6 @@
           }
         }
         document.getElementById("searchbar").focus();
-
-
       },
       approve: function (guest, isMale, index) {
         let db = firebase.database();
@@ -524,7 +523,7 @@
           }
         }
       },
-      addMale: function (nameInput, checkedIn, addedByName, addedByUID) {
+      addMale: function (nameInput, brotherVouch, checkedIn, addedByName, addedByUID) {
         this.input = '';
         let vm = this;
         let names = nameInput.split(',');
@@ -532,6 +531,13 @@
         let addr = 'events/' + this.$route.params.id + '/males';
         let db = firebase.database();
         let hitLimit = false;
+
+        if(!brotherVouch && vm.isFrontDoor) {
+          alert("You need to add a brother to vouch for the guest(s)")
+          this.input = nameInput
+          return
+        }
+
         names.every(function (name) {
           name = name.replace(/[~!@#$%^&*()_|+\-=?;:",.<>\{\}\[\]\\\/]/gi, '').replace(/[0-9]/g, '').trim();
 
@@ -577,7 +583,7 @@
         });
         if (hitLimit) alert("You hit your maximum for male guests, they've been added to the approval list")
       },
-      addFemale: function (nameInput, checkedIn, addedByName, addedByUID) {
+      addFemale: function (nameInput, brotherVouch, checkedIn, addedByName, addedByUID) {
         this.input = '';
         let vm = this;
         let names = nameInput.split(',');
@@ -585,6 +591,12 @@
         let db = firebase.database();
         let addr = 'events/' + this.$route.params.id + '/females';
         let hitLimit = false;
+
+        if(!brotherVouch && vm.isFrontDoor) {
+          alert("You need to add a brother to vouch for the guest(s)")
+          this.input = nameInput
+          return
+        }
         names.every(function (name) {
           name = name.replace(/[~!@#$%^&*()_|+\-=?;:",.<>\{\}\[\]\\\/]/gi, '').replace(/[0-9]/g, '');
 

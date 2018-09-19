@@ -49,7 +49,7 @@
           </article>
         </div>
       </div>
-      <table class="table is-bordered is-fullwidth">
+      <table class="table is-bordered is-striped">
         <thead>
         <tr>
           <th>Time</th>

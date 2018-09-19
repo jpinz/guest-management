@@ -23,8 +23,11 @@
           <td>{{event.total}}</td>
           <td>{{capitalize(event.type)}}</td>
           <td>{{event.date}}</td>
-          <th>
-            <router-link class="button is-link" :to="`/partyJobs/${event.id}`">Jobs</router-link>
+          <th v-if="event.jobsUrl">
+            <a class="button is-link" :href="`${event.jobsUrl}`" target="_blank">Jobs</a>
+          </th>
+          <th v-else>
+            <button class="button is-link" v-on:click="addUrl(event.id)">Add Jobs Sheet</button>
           </th>
           <td>
             <b-switch @input="close(event.id, event.closed)" v-model="event.closed"></b-switch>
@@ -55,9 +58,13 @@
         <td>{{event.total}}</td>
         <td>{{capitalize(event.type)}}</td>
         <td>{{event.date}}</td>
-        <th>
-          <router-link class="button is-link" :to="`/partyJobs/${event.id}`">Jobs</router-link>
+        <th v-if="event.jobsUrl">
+          <a class="button is-link" :href="`${event.jobsUrl}`" target="_blank">Jobs</a>
         </th>
+        <th v-else-if="riskManager">
+          <button class="button is-link" v-on:click="addUrl(event.id)">Add Jobs Sheet</button>
+        </th>
+        <td v-else>Not up</td>
       </tr>
       </tbody>
     </table>
@@ -79,6 +86,7 @@
       return {
         events: [],
         social: false,
+        riskManager: false,
         name: '',
         email: '',
         userId: '',
@@ -107,7 +115,8 @@
             date: moment(currEvents[event].party_date).format("ddd, MMM Do YYYY"),
             type: currEvents[event].type,
             total: (currEvents[event].males && currEvents[event].females) ? Object.keys(currEvents[event].males).length + Object.keys(currEvents[event].females).length : 0,
-            closed: currEvents[event].closed
+            closed: currEvents[event].closed,
+            jobsUrl: currEvents[event].jobsUrl
           });
           i++;
         }
@@ -115,6 +124,8 @@
       db.ref('bros/' + vm.userId).once('value').then(function (snapshot) {
         if (snapshot.val() && (snapshot.val().role === "admin" || snapshot.val().role === "social")) {
           vm.social = true;
+        } else if (snapshot.val() && (snapshot.val().role === "risk" )) {
+          vm.riskManager = true;
         }
         vm.verified = snapshot.val().verified;
       });
@@ -127,6 +138,19 @@
         firebase.database().ref('events/' + id).update({
           closed: closed
         });
+      },
+      addUrl: function (id) {
+        console.log(id);
+        let url = prompt("Please enter the Google sheets URL for the party jobs (with http:// or https:// at the beginning):", "");
+        if (!url) {
+          //User cancelled prompt
+        } else if(url && !url.startsWith("https://") && !url.startsWith("http://")) {
+          alert("You didn't start the url with http:// or https://");
+        } else {
+          firebase.database().ref('events/' + id).update({
+            jobsUrl: url
+          });
+        }
       }
     }
   }
