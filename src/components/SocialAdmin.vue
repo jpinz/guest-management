@@ -2,6 +2,9 @@
   <section class="section">
     <h1 class="title has-text-centered">Manage Social Stuff</h1>
     <router-link to="social/blacklist" class="button is-danger">Manage Blacklist</router-link>
+    <br/><br/>
+
+    <p>There are currently {{brothers.length}} brothers with accounts.</p>
     <table class="table is-fullwidth is-striped">
       <thead>
       <tr>
@@ -58,18 +61,20 @@
         name: '',
         email: '',
         role: '',
-        brothers: []
+        brothers: [],
+        broNames: []
       }
     },
     created() {
-      let user = firebase.auth().currentUser;
+      let user = this.$store.state.user;
       let vm = this;
       let db = firebase.database();
 
       if (user !== null) {
-        vm.userId = user.uid;
         vm.name = user.displayName;
         vm.email = user.email;
+        vm.userId = this.$store.state.uid;
+
       }
 
       db.ref('bros/').orderByChild('sortKey').on('value', (snapshot) => {
@@ -92,6 +97,20 @@
           vm.role = snapshot.val().role;
         }
       });
+
+      db.ref('brotherNames').once('value').then(function (snapshot) {
+        if(!snapshot.val() || snapshot.val().length !== vm.brothers.length) {
+          for (let i = 0; i < vm.brothers.length; i++) {
+            vm.broNames[i] = (vm.brothers[i].name)
+          }
+          firebase.database().ref('brotherNames').set(vm.broNames);
+          console.log("Updated list of brother names!")
+
+        } else {
+          vm.broNames = snapshot.val();
+        }
+      });
+
     },
     methods: {
       update: function (key, id, value) {

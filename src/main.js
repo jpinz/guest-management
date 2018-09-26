@@ -37,7 +37,7 @@ router.beforeEach((to, from, next) => {
   if (requiresAuth && !currentUser) {
     next('/sign-in');
   } else if (requiresAuth && currentUser) {
-    db.ref('bros/' + currentUser.uid).once('value').then(function (snapshot) {
+    db.ref('bros/' + currentUser.email.substr(0, currentUser.email.indexOf('@'))).once('value').then(function (snapshot) {
       if (snapshot.val() && (snapshot.val().role === "admin" || snapshot.val().role === "social" || snapshot.val().role === "risk")) {
         next();
       } else if (requiresSocial) {

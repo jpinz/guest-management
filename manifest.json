@@ -1,0 +1,17 @@
+{
+  "name":"ZM Parties",
+  "description": "The parties site for TKE ZM",
+  "icons":[
+    {
+
+      "src":"static/favicon.ico",
+
+      "type":"image/x-icon",
+
+      "sizes":"64x64"
+
+    }
+
+  ],
+  "display" : "fullscreen"
+}

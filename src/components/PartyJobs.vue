@@ -380,7 +380,7 @@
     },
     created () {
       let db = firebase.database()
-      let user = firebase.auth().currentUser
+      let user = this.$store.state.user
       let vm = this
 
       if (user !== null) {

@@ -23,7 +23,21 @@
           <br/>
         </div>
         <input v-model="input" class="input" type="text" placeholder="Enter guest name(s)" id="searchbar">
-        <input v-if="isFrontDoor" v-model="brotherVouch" class="input" type="text" placeholder="Enter brother's name to vouch for them" id="brotherVouchBar">
+        <div v-if="isFrontDoor">
+          <br/>
+        </div>
+        <b-field label="Add brother to vouch for guest" v-if="isFrontDoor">
+          <b-autocomplete
+            v-model="brotherVouch"
+            :data="filteredBrothersList"
+            open-on-focus
+            keep-first
+            placeholder="e.g. Justin Garon"
+            icon="account"
+            @select="option => selected = option">
+            <template slot="empty">No results found</template>
+          </b-autocomplete>
+        </b-field>
         <br/>
         <div class="addGuest">
           <button v-on:click='addMale(input, brotherVouch, -1, name, userId)' class="button is-info" :disabled="(!paid_bill || party_closed) && !social">Add Male(s)</button>
@@ -75,6 +89,9 @@
             <th v-if="!isFrontDoor && social">
               <button v-on:click="remove(male, true, index, false)" class="button is-link">Delete</button>
             </th>
+            <th v-else-if="!isFrontDoor && male.addedByName === name">
+              <button v-on:click="remove(male, true, index, false)" class="button is-link">Delete</button>
+            </th>
           </tr>
           </tbody>
         </table>
@@ -110,6 +127,9 @@
             <th v-if="!isFrontDoor && social">
               <button v-on:click="remove(female, false, index, false)" class="button is-link">Delete</button>
             </th>
+            <th v-else-if="!isFrontDoor && female.addedByName === name">
+              <button v-on:click="remove(female, false, index, false)" class="button is-link">Delete</button>
+            </th>
           </tr>
           </tbody>
         </table>
@@ -139,6 +159,9 @@
             <th v-if="!isFrontDoor && social">
               <button v-on:click="remove(male, true, index, true)" class="button is-link">Delete</button>
             </th>
+            <th v-else-if="!isFrontDoor && male.addedByName === name">
+              <button v-on:click="remove(male, true, index, false)" class="button is-link">Delete</button>
+            </th>
           </tr>
           </tbody>
         </table>
@@ -163,6 +186,9 @@
             </td>
             <th v-if="!isFrontDoor && social">
               <button v-on:click="remove(female, false, index, true)" class="button is-link">Delete</button>
+            </th>
+            <th v-else-if="!isFrontDoor && female.addedByName === name">
+              <button v-on:click="remove(female, false, index, false)" class="button is-link">Delete</button>
             </th>
           </tr>
           </tbody>
@@ -223,6 +249,7 @@
         userId: '',
         name: '',
         email: '',
+        key: '',
         social: false,
         paid_bill: true,
         isFrontDoor: false,
@@ -232,6 +259,8 @@
         party_type: '',
         party_closed: false,
         input: '',
+        brotherVouch: '',
+        broNames: [],
         blacklist: [],
         males: [],
         females: [],
@@ -250,10 +279,11 @@
     },
     created() {
       let db = firebase.database();
-      let user = firebase.auth().currentUser;
+      let user = this.$store.state.user;
       let vm = this;
 
       if (user !== null) {
+        vm.key = this.$store.state.uid;
         vm.userId = user.uid;
         vm.name = user.displayName;
         vm.email = user.email;
@@ -315,7 +345,7 @@
         });
       });
 
-      const malesListRef = db.ref('bros/' + vm.userId + '/list/males');
+      const malesListRef = db.ref('bros/' + vm.key + '/list/males');
       malesListRef.orderByChild('sortKey').on('value', (snapshot) => {
         let i = 0;
         snapshot.forEach(function (child) {
@@ -330,7 +360,6 @@
         });
       });
 
-      console.log(vm.malesList);
 
       const femalesRef = db.ref('events/' + this.$route.params.id + '/females');
       femalesRef.orderByChild('sortKey').on('value', (snapshot) => {
@@ -367,7 +396,7 @@
           i++;
         });
       });
-      const femalesListRef = db.ref('bros/' + vm.userId + '/list/females');
+      const femalesListRef = db.ref('bros/' + vm.key + '/list/females');
       femalesListRef.orderByChild('sortKey').on('value', (snapshot) => {
         let i = 0;
         snapshot.forEach(function (child) {
@@ -382,12 +411,18 @@
         });
       });
 
-      db.ref('bros/' + vm.userId).once('value').then(function (snapshot) {
+      db.ref('bros/' + vm.key).once('value').then(function (snapshot) {
         if (snapshot.val() && (snapshot.val().role === "admin" || snapshot.val().role === "social")) {
           vm.social = true;
         }
 
         vm.paid_bill = snapshot.val() && snapshot.val().paid_bill === true;
+      });
+
+      db.ref('brotherNames').once('value').then(function (snapshot) {
+        if(snapshot.val()) {
+          vm.broNames = snapshot.val();
+        }
       });
 
     },
@@ -420,6 +455,14 @@
       filteredFemalesList() {
         return this.femalesList.filter(female => {
           return (female.name.toLowerCase().indexOf(this.input.toLowerCase()) > -1)
+        })
+      },
+      filteredBrothersList() {
+        return this.broNames.filter((option) => {
+          return option
+            .toString()
+            .toLowerCase()
+            .indexOf(this.brotherVouch.toLowerCase()) >= 0
         })
       }
     },
@@ -481,14 +524,14 @@
         if (isMale) {
           let addr = 'events/' + this.$route.params.id + '/males';
 
-          db.ref('bros/' + vm.userId+ '/list/males/' + guest.id).once("value", function (snapshot) {
+          db.ref('bros/' + vm.key+ '/list/males/' + guest.id).once("value", function (snapshot) {
             let male = snapshot.val();
             db.ref(addr + '/' + guest.id).set(male);
           });
         } else {
           let addr = 'events/' + this.$route.params.id + '/females';
 
-          db.ref('bros/' + vm.userId+ '/list/females/' + guest.id).once("value", function (snapshot) {
+          db.ref('bros/' + vm.key+ '/list/females/' + guest.id).once("value", function (snapshot) {
             let female = snapshot.val();
             db.ref(addr + '/' + guest.id).set(female);
           });
@@ -496,7 +539,14 @@
       },
       remove: function (guest, isMale, index, approvalList) {
         let db = firebase.database();
+
+        let del = confirm("Do you want to delete: " + guest.name + "?");
+        if(!del) {
+          return
+        }
+
         console.log("Removing guest: " + guest.name);
+
         if (approvalList) {
           if (isMale) {
             let addr = 'events/' + this.$route.params.id + '/males_approval/';
@@ -536,6 +586,8 @@
           alert("You need to add a brother to vouch for the guest(s)")
           this.input = nameInput
           return
+        } else if(brotherVouch) {
+          addedByName = brotherVouch
         }
 
         names.every(function (name) {
@@ -554,7 +606,7 @@
               hitLimit = true;
               let newMaleId = db.ref().push().key;
               let sortKeyArr = name.split(' ');
-              let sortKey = sortKeyArr.splice(1).join('') + sortKeyArr[0];
+              let sortKey = sortKeyArr.splice(1).join('').charAt(0).toUpperCase() + sortKeyArr[0];
               db.ref(addr + '_approval/' + newMaleId).set({
                 name: name,
                 checkedIn: checkedIn,
@@ -565,7 +617,7 @@
             } else {
               let newMaleId = db.ref().push().key;
               let sortKeyArr = name.split(' ');
-              let sortKey = sortKeyArr.splice(1).join('') + sortKeyArr[0];
+              let sortKey = sortKeyArr.splice(1).join('').charAt(0).toUpperCase() + sortKeyArr[0];
               db.ref(addr + '/' + newMaleId).set({
                 name: name,
                 checkedIn: checkedIn,
@@ -596,9 +648,12 @@
           alert("You need to add a brother to vouch for the guest(s)")
           this.input = nameInput
           return
+        } else if(brotherVouch) {
+          addedByName = brotherVouch
         }
+
         names.every(function (name) {
-          name = name.replace(/[~!@#$%^&*()_|+\-=?;:",.<>\{\}\[\]\\\/]/gi, '').replace(/[0-9]/g, '');
+          name = name.replace(/[~!@#$%^&*()_|+\-=?;:",.<>\{\}\[\]\\\/]/gi, '').replace(/[0-9]/g, '').trim();
 
           if (vm.blacklist.includes(name.toLowerCase())) {
             alert(name + " is on the blacklist! They will not be added to the guest list.");
@@ -611,7 +666,7 @@
               hitLimit = true;
               let newFemaleId = db.ref().push().key;
               let sortKeyArr = name.split(' ');
-              let sortKey = sortKeyArr.splice(1).join('') + sortKeyArr[0];
+              let sortKey = sortKeyArr.splice(1).join('').charAt(0).toUpperCase() + sortKeyArr[0];
               db.ref(addr + '_approval/' + newFemaleId).set({
                 name: name,
                 checkedIn: checkedIn,

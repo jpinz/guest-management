@@ -150,7 +150,7 @@
           vm.missingName = true
           return
         }
-        if (!vm.jobsUrl.startsWith("https://") && !vm.jobsUrl.startsWith("http://")) {
+        if (vm.jobsUrl && !vm.jobsUrl.startsWith("https://") && !vm.jobsUrl.startsWith("http://")) {
           alert("You didn't start the url with http:// or https://");
           return
         }

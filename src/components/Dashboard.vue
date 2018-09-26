@@ -1,5 +1,5 @@
 <template>
-  <section v-if="verified" class="section">
+  <section v-if="verified && !accountDeleted" class="section">
     <h1 class="title has-text-centered">Events</h1>
 
     <div v-if="social == true">
@@ -69,6 +69,16 @@
       </tbody>
     </table>
   </section>
+  <section v-else-if="accountDeleted">
+    <br/>
+    <div class="notification is-warning">
+      Your account has been removed from the database:
+    </div>
+    <button class="button is-danger" v-on:click="deleteAccount()">Click here to Delete your account</button>
+    <br/><br/>
+    <button class="button is-link" v-on:click="deleteAccount(true)">Click here to email Julian to complain (if you think this was a mistake)</button>
+
+  </section>
   <section v-else>
     <br/>
     <div class="notification is-danger">
@@ -90,18 +100,19 @@
         name: '',
         email: '',
         userId: '',
-        verified: false
+        verified: false,
+        accountDeleted: false
       }
     },
     created() {
       let db = firebase.database();
       let vm = this;
-      let user = firebase.auth().currentUser;
+      let user = this.$store.state.user;
 
       if (user !== null) {
         vm.name = user.displayName;
         vm.email = user.email;
-        vm.userId = user.uid;
+        vm.userId = this.$store.state.uid
       }
 
       var eventsRef = db.ref('events/');
@@ -122,12 +133,17 @@
         }
       });
       db.ref('bros/' + vm.userId).once('value').then(function (snapshot) {
-        if (snapshot.val() && (snapshot.val().role === "admin" || snapshot.val().role === "social")) {
-          vm.social = true;
-        } else if (snapshot.val() && (snapshot.val().role === "risk" )) {
-          vm.riskManager = true;
+        if(snapshot.val()) {
+          vm.verified = snapshot.val().verified;
+          if (snapshot.val().role === "admin" || snapshot.val().role === "social") {
+            vm.social = true;
+          } else if (snapshot.val().role === "risk" ) {
+            vm.riskManager = true;
+          }
+        } else {
+          vm.accountDeleted = true;
         }
-        vm.verified = snapshot.val().verified;
+
       });
     },
     methods: {
@@ -149,6 +165,22 @@
         } else {
           firebase.database().ref('events/' + id).update({
             jobsUrl: url
+          });
+        }
+      },
+      deleteAccount: function (sendEmail = false) {
+        let user = firebase.auth().currentUser;
+        let vm = this;
+        if(sendEmail) {
+          location.href='mailto:julian.pinzer@gmail.com?subject=ZM Parties Account Deleted'
+        } else {
+          user.delete().then(function() {
+            // User deleted.
+            vm.$router.push({path: `/sign-in`})
+
+          }).catch(function(error) {
+            // An error happened.
+            alert(error.message)
           });
         }
       }

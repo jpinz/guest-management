@@ -26,7 +26,7 @@
       }
     },
     created() {
-      let user = firebase.auth().currentUser;
+      let user = this.$store.state.user;
       let vm = this;
 
       if (user !== null) {
@@ -39,7 +39,7 @@
     },
     methods: {
       changeEmail: function (event) {
-        let user = firebase.auth().currentUser;
+        let user = this.$store.state.user;
         user.updateEmail(this.email).then(function () {
           // Update successful.
           console.log("Successful update of email.")

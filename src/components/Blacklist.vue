@@ -49,12 +49,12 @@
       }
     },
     created() {
-      let user = firebase.auth().currentUser;
+      let user = this.$store.state.user;
       let vm = this;
       let db = firebase.database();
 
       if (user !== null) {
-        vm.userId = user.uid;
+        vm.userId = this.$store.state.uid;
         vm.name = user.displayName;
         vm.email = user.email;
       }
@@ -81,7 +81,6 @@
     methods: {
       addToBlackList: function (name, addedByName, addedByUID) {
         this.input = '';
-        let vm = this;
 
         let db = firebase.database();
 

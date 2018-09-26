@@ -85,10 +85,6 @@
         blacklist: [],
         males: [],
         females: [],
-        checkedIn: 0,
-        maleLimit: '',
-        femaleLimit: '',
-        generalLimit: '',
         malesAdded: 0,
         femalesAdded: 0,
         generalAdded: 0
@@ -96,11 +92,11 @@
     },
     created() {
       let db = firebase.database();
-      let user = firebase.auth().currentUser;
+      let user = this.$store.state.user;
       let vm = this;
 
       if (user !== null) {
-        vm.userId = user.uid;
+        vm.userId = this.$store.state.uid;
         vm.name = user.displayName;
         vm.email = user.email;
       }
@@ -202,10 +198,9 @@
           } else if (!name || name === undefined || name === "" || name.length === 0) {
             console.log("Name was empty, didn't add");
           } else {
-            console.log(vm.generalAdded + " " + vm.generalLimit);
             let newMaleId = db.ref().push().key;
             let sortKeyArr = name.split(' ');
-            let sortKey = sortKeyArr.splice(1).join('') + sortKeyArr[0];
+            let sortKey = sortKeyArr.splice(1).join('').charAt(0).toUpperCase() + sortKeyArr[0];
             db.ref(addr + '/' + newMaleId).set({
               name: name,
               checkedIn: checkedIn,
@@ -225,7 +220,7 @@
         let db = firebase.database();
         let addr = 'bros/' + vm.userId+ '/list/females';
         names.every(function (name) {
-          name = name.replace(/[~!@#$%^&*()_|+\-=?;:",.<>\{\}\[\]\\\/]/gi, '').replace(/[0-9]/g, '');
+          name = name.replace(/[~!@#$%^&*()_|+\-=?;:",.<>\{\}\[\]\\\/]/gi, '').replace(/[0-9]/g, '').trim();
 
           if (vm.blacklist.includes(name.toLowerCase())) {
             alert(name + " is on the blacklist! They will not be added to the guest list.");
@@ -236,7 +231,7 @@
           } else {
             let newFemaleId = db.ref().push().key;
             let sortKeyArr = name.split(' ');
-            let sortKey = sortKeyArr.splice(1).join('') + sortKeyArr[0];
+            let sortKey = sortKeyArr.splice(1).join('').charAt(0).toUpperCase() + sortKeyArr[0];
             db.ref(addr + '/' + newFemaleId).set({
               name: name,
               checkedIn: checkedIn,

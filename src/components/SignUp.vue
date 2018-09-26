@@ -23,18 +23,13 @@
 
                 </div>
               </div>
-              <div class="field">
-                <label class="label">Email</label>
-                <div class="control">
-                  <input class="input" type="email" placeholder="example@email.com" v-model="email">
-                </div>
-              </div>
-              <div class="field">
-                <label class="label">Password</label>
-                <div class="control">
-                  <input class="input" type="password" v-model="password">
-                </div>
-              </div>
+              <b-field label="Email">
+                <b-input type="email" placeholder="example@email.com" v-model="email"></b-input>
+              </b-field>
+
+              <b-field label="Password">
+                <b-input type="password" v-model="password" placeholder="Password"></b-input>
+              </b-field>
               <button type="submit" class="button is-primary" v-on:click="signUp">Sign-up</button>
             </form>
           </div>
@@ -54,7 +49,7 @@
         email: "",
         password: "",
         name: "",
-        missingName: false,
+        missingName: false
       };
     },
     methods: {
@@ -69,29 +64,29 @@
           vm.email = '';
           return;
         }
+
+        let db = firebase.database();
+
         firebase.auth()
-          .createUserWithEmailAndPassword(this.email, this.password)
+          .createUserWithEmailAndPassword(vm.email, vm.password)
           .then(
             user => {
-              let db = firebase.database();
-
-              name = this.name;
-              user.updateProfile({
-                displayName: name
+              user.user.updateProfile({
+                displayName: vm.name
               }).then(function () {
                 // Update successful.
-                console.log("Successful name update: " + name)
+                console.log("Successful name update: " + vm.name)
               }).catch(function (error) {
                 // An error happened.
                 alert("Error: " + error.message)
               });
 
-              let sortKeyArr = name.split(' ');
+              let sortKeyArr = vm.name.split(' ');
               let sortKey = sortKeyArr.splice(1).join('') + sortKeyArr[0];
-
-              db.ref('bros/' + user.uid).set({
-                name: name,
-                email: user.email,
+              console.log("name: " + vm.name + " email: " + vm.email + " sortKey: " + sortKey)
+              db.ref('bros/' + vm.email.substr(0, vm.email.indexOf('@'))).set({
+                name: vm.name,
+                email: vm.email,
                 paid_bill: false,
                 sortKey: sortKey,
                 verified: false,
@@ -103,6 +98,8 @@
               alert(error.message);
             }
           );
+
+
       }
     }
   };

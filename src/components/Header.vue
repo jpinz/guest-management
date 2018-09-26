@@ -30,10 +30,10 @@
     },
     created() {
       let db = Firebase.database();
-      let user = Firebase.auth().currentUser;
+      let user = this.$store.state.user;
       let vm = this;
       if (user) {
-        db.ref('bros/' + user.uid).once('value').then(function (snapshot) {
+        db.ref('bros/' + this.$store.state.uid).once('value').then(function (snapshot) {
           if (snapshot.val() && (snapshot.val().role === "admin" || snapshot.val().role === "social")) {
             vm.social = true;
           }
