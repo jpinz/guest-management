@@ -3,6 +3,12 @@
     <h1 class="title has-text-centered">{{party_name}}</h1>
     <h4 class="subtitle has-text-centered is-4">{{party_date}} - {{party_type}}</h4>
     <div class="field" id="center" v-if="social">
+      <div v-if="!isFrontDoor" >
+        <button class="button is-info" v-on:click='downloadSpreadsheet()'>
+          Download Spreadsheet
+        </button>
+        <br/> <br/>
+      </div>
       <span>Front Door Mode enabled: </span>
       <b-switch @input="frontDoor(isFrontDoor)" v-model="isFrontDoor">
       </b-switch>
@@ -26,7 +32,7 @@
         <div v-if="isFrontDoor">
           <br/>
         </div>
-        <b-field label="Add brother to vouch for guest" v-if="isFrontDoor">
+        <b-field label="Add brother to vouch for guest" v-if="isFrontDoor && allowVouching">
           <b-autocomplete
             v-model="brotherVouch"
             :data="filteredBrothersList"
@@ -40,10 +46,10 @@
         </b-field>
         <br/>
         <div class="addGuest">
-          <button v-on:click='addMale(input, brotherVouch, -1, name, userId)' class="button is-info" :disabled="(!paid_bill || party_closed) && !social">Add Male(s)</button>
+          <button v-on:click='addMale(input, brotherVouch, -1, name, key)' class="button is-info" :disabled="(!paid_bill || party_closed) && !social">Add Male(s)</button>
         </div>
         <div class="addGuest">
-          <button v-on:click='addFemale(input, brotherVouch, -1, name, userId)' class="button is-danger" :disabled="(!paid_bill || party_closed) && !social" style="margin-left: 20px;">
+          <button v-on:click='addFemale(input, brotherVouch, -1, name, key)' class="button is-danger" :disabled="(!paid_bill || party_closed) && !social" style="margin-left: 20px;">
             Add Female(s)
           </button>
         </div>
@@ -242,6 +248,7 @@
 <script>
   import firebase from 'firebase'
   import moment from 'moment'
+  import XLSX from 'xlsx'
 
   export default {
     data() {
@@ -258,6 +265,7 @@
         party_date: '',
         party_type: '',
         party_closed: false,
+        allowVouching: false,
         input: '',
         brotherVouch: '',
         broNames: [],
@@ -296,6 +304,7 @@
         vm.party_date = moment(event.party_date).format("ddd, MMM Do YYYY");
         vm.party_name = event.name;
         vm.party_closed = event.closed;
+        vm.allowVouching = event.allowVouching;
         (event.maleGuests !== -1 ) ? vm.maleLimit = event.maleGuests : vm.maleLimit = '∞';
         (event.femaleGuests !== -1 ) ? vm.femaleLimit = event.femaleGuests : vm.femaleLimit = '∞';
         (event.generalGuests !== -1 ) ? vm.generalLimit = event.generalGuests : vm.generalLimit= '∞';
@@ -328,6 +337,10 @@
         });
         vm.malesAdded = count;
         vm.generalAdded = vm.malesAdded + vm.femalesAdded;
+
+        db.ref('bros/' + vm.key + '/events/' + vm.party_id).update({
+          males: vm.malesAdded
+        });
       });
 
       const malesApprovalRef = db.ref('events/' + this.$route.params.id + '/males_approval');
@@ -380,6 +393,10 @@
         });
         vm.femalesAdded = count;
         vm.generalAdded = vm.malesAdded + vm.femalesAdded;
+
+        db.ref('bros/' + vm.key + '/events/' + vm.party_id).update({
+          females: vm.femalesAdded
+        });
       });
 
       const femalesApprovalRef = db.ref('events/' + this.$route.params.id + '/females_approval');
@@ -480,6 +497,10 @@
         let db = firebase.database();
         let d = new Date();
         if(checkOut) {
+          let out = confirm("Do you want check out: " + guest.name + "?");
+          if(!out) {
+            return
+          }
           if (isMale) {
             db.ref('events/' + this.$route.params.id + '/males/' + guest.id).update({'checkedIn': -1});
           } else {
@@ -527,6 +548,7 @@
           db.ref('bros/' + vm.key+ '/list/males/' + guest.id).once("value", function (snapshot) {
             let male = snapshot.val();
             db.ref(addr + '/' + guest.id).set(male);
+            vm.malesAdded++;
           });
         } else {
           let addr = 'events/' + this.$route.params.id + '/females';
@@ -534,11 +556,13 @@
           db.ref('bros/' + vm.key+ '/list/females/' + guest.id).once("value", function (snapshot) {
             let female = snapshot.val();
             db.ref(addr + '/' + guest.id).set(female);
+            vm.femalesAdded++;
           });
         }
       },
       remove: function (guest, isMale, index, approvalList) {
         let db = firebase.database();
+        let vm = this;
 
         let del = confirm("Do you want to delete: " + guest.name + "?");
         if(!del) {
@@ -565,12 +589,18 @@
             this.males.splice(index, 1);
 
             db.ref(addr + guest.id).remove();
+            vm.malesAdded--;
           } else {
             let addr = 'events/' + this.$route.params.id + '/females/';
             this.females.splice(index, 1);
 
             db.ref(addr + guest.id).remove();
+            vm.femalesAdded--;
           }
+          db.ref('bros/' + vm.key + '/events/' + vm.party_id).set({
+            males: vm.malesAdded,
+            females: vm.femalesAdded
+          });
         }
       },
       addMale: function (nameInput, brotherVouch, checkedIn, addedByName, addedByUID) {
@@ -605,27 +635,21 @@
             if ((vm.malesAdded >= vm.maleLimit || vm.generalAdded >= vm.generalLimit) && !vm.social) {
               hitLimit = true;
               let newMaleId = db.ref().push().key;
-              let sortKeyArr = name.split(' ');
-              let sortKey = sortKeyArr.splice(1).join('').charAt(0).toUpperCase() + sortKeyArr[0];
               db.ref(addr + '_approval/' + newMaleId).set({
                 name: name,
                 checkedIn: checkedIn,
                 addedByName: addedByName,
-                addedByUID: addedByUID,
-                sortKey: sortKey
+                addedByUID: addedByUID
               });
             } else {
               let newMaleId = db.ref().push().key;
-              let sortKeyArr = name.split(' ');
-              let sortKey = sortKeyArr.splice(1).join('').charAt(0).toUpperCase() + sortKeyArr[0];
               db.ref(addr + '/' + newMaleId).set({
                 name: name,
                 checkedIn: checkedIn,
                 addedByName: addedByName,
-                addedByUID: addedByUID,
-                sortKey: sortKey
+                addedByUID: addedByUID
               });
-              db.ref('bros/' + addedByUID + '/events/' + vm.party_id).set({
+              db.ref('bros/' + vm.key + '/events/' + vm.party_id).set({
                 males: vm.malesAdded,
                 females: vm.femalesAdded
               });
@@ -665,28 +689,22 @@
             if ((vm.femalesAdded >= vm.femaleLimit || vm.generalAdded >= vm.generalLimit) && !vm.social) {
               hitLimit = true;
               let newFemaleId = db.ref().push().key;
-              let sortKeyArr = name.split(' ');
-              let sortKey = sortKeyArr.splice(1).join('').charAt(0).toUpperCase() + sortKeyArr[0];
               db.ref(addr + '_approval/' + newFemaleId).set({
                 name: name,
                 checkedIn: checkedIn,
                 addedByName: addedByName,
-                addedByUID: addedByUID,
-                sortKey: sortKey
+                addedByUID: addedByUID
               });
             } else {
               let newFemaleId = db.ref().push().key;
-              let sortKeyArr = name.split(' ');
-              let sortKey = sortKeyArr.splice(1).join('') + sortKeyArr[0];
               db.ref(addr + '/' + newFemaleId).set({
                 name: name,
                 checkedIn: checkedIn,
                 addedByName: addedByName,
-                addedByUID: addedByUID,
-                sortKey: sortKey
+                addedByUID: addedByUID
               });
 
-              db.ref('bros/' + addedByUID + '/events/' + vm.party_id).set({
+              db.ref('bros/' + vm.key + '/events/' + vm.party_id).set({
                 males: vm.malesAdded,
                 females: vm.femalesAdded
               });
@@ -695,6 +713,25 @@
           return true;
         });
         if (hitLimit) alert("You hit your maximum for female guests, they've been added to the approval list")
+      },
+      downloadSpreadsheet: function() {
+        let vm = this;
+        let fileName = vm.party_name.replace(/\s/g,'') + '.xlsx'
+        console.log(fileName)
+        let malesSheet = XLSX.utils.json_to_sheet(vm.males);
+        let femalesSheet = XLSX.utils.json_to_sheet(vm.females);
+        let workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, malesSheet, "Males");
+        XLSX.utils.book_append_sheet(workbook, femalesSheet, "Females");
+        workbook.Props = {};
+        workbook.Props.Title = vm.party_name;
+        workbook.Custprops = {};
+        workbook.Custprops["Event Date"] = vm.party_date;
+        workbook.Custprops["Event Type"] = vm.party_type;
+
+        XLSX.write(workbook, {Props:{Author:vm.name}, bookSST:true, type: 'base64'});
+
+        XLSX.writeFile(workbook, fileName)
       }
     },
   };

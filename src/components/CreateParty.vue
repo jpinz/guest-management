@@ -31,7 +31,9 @@
                       icon="calendar-today">
         </b-datepicker>
       </b-field>
-
+      <span>Allow Vouching: </span>
+      <b-switch v-model="allowVouching"></b-switch>
+      <br/>
       <label class="label">Number of Male Guests per Brother</label>
       <div class="control">
         <input v-model="maleGuestCount" class="input" type="number" :disabled="generalGuestCount != 0"
@@ -88,6 +90,7 @@
         email: '',
         party_id: this.$route.query.edit,
         missingName: false,
+        allowVouching: false,
         type: 'social',
         party_date: new Date(),
         brothers: [],
@@ -124,6 +127,7 @@
           vm.party_date = new Date(event.party_date)
           vm.name = event.name;
           vm.jobsUrl = event.jobsUrl;
+          vm.allowVouching = events.allowVouching;
           (event.maleGuests !== -1 ) ? vm.maleGuestCount = event.maleGuests : vm.maleGuestCount = -1;
           (event.femaleGuests !== -1 ) ? vm.femaleGuestCount = event.femaleGuests : vm.femaleGuestCount = -1
           if (event.generalGuests) {

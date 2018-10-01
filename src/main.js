@@ -33,7 +33,6 @@ router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresSocial = to.matched.some(record => record.meta.requiresSocial);
 
-
   if (requiresAuth && !currentUser) {
     next('/sign-in');
   } else if (requiresAuth && currentUser) {

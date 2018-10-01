@@ -1,6 +1,8 @@
 <template>
   <section class="section">
     <h1 class="title has-text-centered">Manage Social Stuff</h1>
+    <h2 class="subtitle has-text-centered" v-if="unverifiedCount>0">There are {{unverifiedCount}} unverified accounts.</h2>
+
     <router-link to="social/blacklist" class="button is-danger">Manage Blacklist</router-link>
     <br/><br/>
 
@@ -62,7 +64,8 @@
         email: '',
         role: '',
         brothers: [],
-        broNames: []
+        broNames: [],
+        unverifiedCount: 0
       }
     },
     created() {
@@ -89,6 +92,9 @@
             verified: child.val().verified
           });
           i++;
+          if(!child.val().verified) {
+            vm.unverifiedCount++;
+          }
         });
       });
 

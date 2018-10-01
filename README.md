@@ -30,4 +30,21 @@ npm run e2e
 npm test
 ```
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+## Normal config
+Change info in appConfig.json to whatever you want.
+
+## Firebase config
+Put your config (should look like this):
+
+```
+export const config = {
+  apiKey: 'key',
+  authDomain: 'guest-management.firebaseapp.com',
+  databaseURL: 'https://guest-management.firebaseio.com',
+  projectId: 'guest-management',
+  storageBucket: 'guest-management.appspot.com',
+  messagingSenderId: 'id'
+};
+```
+
+into a file called `firebaseConfig.js` in `src/config`

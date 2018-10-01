@@ -1,5 +1,6 @@
 <template>
   <main id="app" class="section">
+    <title>{{title}}</title>
     <div class="container">
       <nav-main></nav-main>
       <router-view></router-view>
@@ -9,7 +10,16 @@
 
 <script>
   import Header from './components/Header.vue';
+  import * as config from '../appConfig.json';
+
   export default {
+    data() {
+      return {
+        title: config.title,
+        description: config.description,
+        id: config.id
+      }
+    },
     components: {
       navMain: Header
     },

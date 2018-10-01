@@ -24,6 +24,9 @@
                 </div>
               </div>
               <button type="submit" class="button is-primary" v-on:click="signIn">Sign-in</button>
+              <br/> <br/>
+              <button type="submit" class="button is-info" v-on:click="resetPassword">Forgot Password?</button>
+
             </form>
           </div>
         </div>
@@ -55,6 +58,21 @@
               alert(error.message);
             }
           );
+      },
+      resetPassword: function () {
+        var auth = Firebase.auth();
+        let email = prompt("Enter your email address")
+        if(!email) {
+          alert("Enter an email address")
+          return
+        }
+        auth.sendPasswordResetEmail(email).then(function() {
+          // Email sent.
+          alert("Email sent!")
+        }).catch(function(error) {
+          // An error happened.
+          alert(error.message)
+        });
       }
     }
   };

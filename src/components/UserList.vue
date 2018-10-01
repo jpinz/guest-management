@@ -199,8 +199,8 @@
             console.log("Name was empty, didn't add");
           } else {
             let newMaleId = db.ref().push().key;
-            let sortKeyArr = name.split(' ');
-            let sortKey = sortKeyArr.splice(1).join('').charAt(0).toUpperCase() + sortKeyArr[0];
+            let sortKeyArr = name.toUpperCase().split(' ');
+            let sortKey = sortKeyArr.splice(1).join('') + sortKeyArr[0];
             db.ref(addr + '/' + newMaleId).set({
               name: name,
               checkedIn: checkedIn,
@@ -230,8 +230,8 @@
             console.log("Name was empty, didn't add");
           } else {
             let newFemaleId = db.ref().push().key;
-            let sortKeyArr = name.split(' ');
-            let sortKey = sortKeyArr.splice(1).join('').charAt(0).toUpperCase() + sortKeyArr[0];
+            let sortKeyArr = name.toUpperCase().split(' ');
+            let sortKey = sortKeyArr.splice(1).join('') + sortKeyArr[0];
             db.ref(addr + '/' + newFemaleId).set({
               name: name,
               checkedIn: checkedIn,
