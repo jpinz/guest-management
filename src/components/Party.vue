@@ -86,7 +86,7 @@
               </button>
             </td>
             <td v-else-if="male.checkedIn != -1 && !isFrontDoor">
-              <button v-on:click="checkIn(male, true, true)" class="button is-danger"
+              <button v-on:click="checkIn(male, true, true)" class="button is-info"
                       :disabled="social == false ">
                 {{male.checkedIn}}
               </button>
@@ -305,6 +305,7 @@
         vm.party_name = event.name;
         vm.party_closed = event.closed;
         vm.allowVouching = event.allowVouching;
+        vm.checkedIn = (event.checkedIn && event.checkedIn > 0) ? event.checkedIn : 0;
         (event.maleGuests !== -1 ) ? vm.maleLimit = event.maleGuests : vm.maleLimit = '∞';
         (event.femaleGuests !== -1 ) ? vm.femaleLimit = event.femaleGuests : vm.femaleLimit = '∞';
         (event.generalGuests !== -1 ) ? vm.generalLimit = event.generalGuests : vm.generalLimit= '∞';
@@ -325,7 +326,7 @@
         let count = 0;
         snapshot.forEach(function (child) {
           if (child.val().addedByUID === vm.userId) count++;
-          if (child.val().checkedIn !== -1) vm.checkedIn++;
+          // if (child.val().checkedIn !== -1) vm.checkedIn++;
           vm.$set(vm.males, i, {
             id: child.key,
             name: child.val().name,
@@ -380,8 +381,7 @@
         let count = 0;
         snapshot.forEach(function (child) {
           if (child.val().addedByUID === vm.userId) count++;
-          if (child.val().checkedIn !== -1) vm.checkedIn++;
-
+          // if (child.val().checkedIn !== -1) vm.checkedIn++;
           vm.$set(vm.females, i, {
             id: child.key,
             name: child.val().name,
@@ -496,6 +496,7 @@
         this.input = '';
         let db = firebase.database();
         let d = new Date();
+        let vm = this;
         if(checkOut) {
           let out = confirm("Do you want check out: " + guest.name + "?");
           if(!out) {
@@ -506,12 +507,18 @@
           } else {
             db.ref('events/' + this.$route.params.id + '/females/' + guest.id).update({'checkedIn': -1});
           }
+          vm.checkedIn--;
+          db.ref('events/' + this.$route.params.id).update({'checkedIn': vm.checkedIn});
+
         } else {
           if (isMale) {
             db.ref('events/' + this.$route.params.id + '/males/' + guest.id).update({'checkedIn': d.getTime()});
           } else {
             db.ref('events/' + this.$route.params.id + '/females/' + guest.id).update({'checkedIn': d.getTime()});
           }
+
+          vm.checkedIn++;
+          db.ref('events/' + this.$route.params.id).update({'checkedIn': vm.checkedIn});
         }
         document.getElementById("searchbar").focus();
       },
@@ -630,8 +637,6 @@
           } else if (!name || name === undefined || name === "" || name.length === 0) {
             console.log("Name was empty, didn't add");
           } else {
-            console.log(vm.generalAdded + " " + vm.generalLimit);
-
             if ((vm.malesAdded >= vm.maleLimit || vm.generalAdded >= vm.generalLimit) && !vm.social) {
               hitLimit = true;
               let newMaleId = db.ref().push().key;

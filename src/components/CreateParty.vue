@@ -93,8 +93,6 @@
         allowVouching: false,
         type: 'social',
         party_date: new Date(),
-        brothers: [],
-        risk: [],
         maleGuestCount: 0,
         femaleGuestCount: 0,
         generalGuestCount: 0
@@ -104,21 +102,6 @@
       let db = firebase.database()
       let vm = this
 
-      db.ref('bros/').orderByChild('sortKey').on('value', (snapshot) => {
-        let i = 0
-        let k = 0
-        snapshot.forEach(function (child) {
-          if (child.val().role === "risk") {
-            console.log(child.val());
-            vm.$set(vm.risk, k, child.val().name)
-            k++
-          } else {
-            vm.$set(vm.brothers, i, child.val().name)
-            i++
-          }
-        })
-      })
-
       if (vm.party_id) {
         const eventRef = db.ref('events/' + vm.party_id)
         eventRef.on('value', (snapshot) => {
@@ -127,7 +110,7 @@
           vm.party_date = new Date(event.party_date)
           vm.name = event.name;
           vm.jobsUrl = event.jobsUrl;
-          vm.allowVouching = events.allowVouching;
+          vm.allowVouching = event.allowVouching;
           (event.maleGuests !== -1 ) ? vm.maleGuestCount = event.maleGuests : vm.maleGuestCount = -1;
           (event.femaleGuests !== -1 ) ? vm.femaleGuestCount = event.femaleGuests : vm.femaleGuestCount = -1
           if (event.generalGuests) {
@@ -171,6 +154,7 @@
               name: vm.name,
               type: vm.type,
               generalGuests: parseInt(vm.generalGuestCount),
+              allowVouching: vm.allowVouching,
               party_date: vm.party_date.getTime(),
               jobsUrl: vm.jobsUrl
             })
@@ -180,6 +164,7 @@
               type: vm.type,
               maleGuests: parseInt(vm.maleGuestCount),
               femaleGuests: parseInt(vm.femaleGuestCount),
+              allowVouching: vm.allowVouching,
               party_date: vm.party_date.getTime(),
               jobsUrl: vm.jobsUrl
             })
@@ -192,6 +177,7 @@
               name: vm.name,
               type: vm.type,
               generalGuests: parseInt(vm.generalGuestCount),
+              allowVouching: vm.allowVouching,
               party_date: vm.party_date.getTime(),
               jobsUrl: vm.jobsUrl,
               closed: false
@@ -202,6 +188,7 @@
               type: vm.type,
               maleGuests: parseInt(vm.maleGuestCount),
               femaleGuests: parseInt(vm.femaleGuestCount),
+              allowVouching: vm.allowVouching,
               party_date: vm.party_date.getTime(),
               jobsUrl: vm.jobsUrl,
               closed: false
