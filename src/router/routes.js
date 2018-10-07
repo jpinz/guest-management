@@ -4,6 +4,7 @@ import Error404 from '../components/Error404.vue';
 import Dashboard from '../components/Dashboard.vue';
 import Account from '../components/Account.vue';
 import Party from '../components/Party.vue';
+import PartyStats from '../components/PartyStats.vue';
 import CreateParty from '../components/CreateParty.vue';
 import SocialAdmin from '../components/SocialAdmin.vue';
 import Blacklist from '../components/Blacklist.vue';
@@ -19,6 +20,10 @@ export const routes = [
   {path: '/party/account', redirect: '/account'},
   {path: '/party/social', redirect: '/social'},
   {path: '/party/userlist', redirect: '/userlist'},
+
+  {path: '/partyStats/account', redirect: '/account'},
+  {path: '/partyStats/social', redirect: '/social'},
+  {path: '/partyStats/userlist', redirect: '/userlist'},
 
   {path: '/social/account', redirect: '/account'},
   {path: '/social/social', redirect: '/social'},
@@ -81,6 +86,14 @@ export const routes = [
     path: '/party/:id',
     name: 'party',
     component: Party,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/partyStats/:id',
+    name: 'partyStats',
+    component: PartyStats,
     meta: {
       requiresAuth: true
     }

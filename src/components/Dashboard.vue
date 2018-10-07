@@ -11,6 +11,7 @@
           <th>Type</th>
           <th>Date</th>
           <th>Jobs</th>
+          <th>Stats</th>
           <th>Close</th>
           <th>Modify</th>
         </tr>
@@ -28,6 +29,9 @@
           </th>
           <th v-else>
             <button class="button is-link" v-on:click="addUrl(event.id)">Add Jobs Sheet</button>
+          </th>
+          <th>
+            <router-link :to="`/partyStats/${event.id}` ">Stats</router-link>
           </th>
           <td>
             <b-switch @input="close(event.id, event.closed)" v-model="event.closed"></b-switch>
@@ -48,6 +52,7 @@
         <th>Type</th>
         <th>Date</th>
         <th>Jobs</th>
+        <th>Stats</th>
       </tr>
       </thead>
       <tbody>
@@ -65,6 +70,9 @@
           <button class="button is-link" v-on:click="addUrl(event.id)">Add Jobs Sheet</button>
         </th>
         <td v-else>Not up</td>
+        <th>
+          <router-link :to="`/partyStats/${event.id}` ">Stats</router-link>
+        </th>
       </tr>
       </tbody>
     </table>
@@ -189,4 +197,3 @@
   }
 
 </script>
-
