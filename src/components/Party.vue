@@ -3,12 +3,6 @@
     <h1 class="title has-text-centered">{{party_name}}</h1>
     <h4 class="subtitle has-text-centered is-4">{{party_date}} - {{party_type}}</h4>
     <div class="field" id="center" v-if="social">
-      <div v-if="!isFrontDoor" >
-        <button class="button is-info" v-on:click='downloadSpreadsheet()'>
-          Download Spreadsheet
-        </button>
-        <br/> <br/>
-      </div>
       <span>Front Door Mode enabled: </span>
       <b-switch @input="frontDoor(isFrontDoor)" v-model="isFrontDoor">
       </b-switch>
@@ -29,7 +23,7 @@
           <br/>
         </div>
         <input v-model="input" class="input" type="text" placeholder="Enter guest name(s)" id="searchbar">
-        <div v-if="isFrontDoor">
+        <div v-if="isFrontDoor && allowVouching">
           <br/>
         </div>
         <b-field label="Add brother to vouch for guest" v-if="isFrontDoor && allowVouching">
@@ -45,10 +39,10 @@
           </b-autocomplete>
         </b-field>
         <br/>
-        <div class="addGuest">
+        <div class="addGuest" v-if="allowVouching || !party_closed">
           <button v-on:click='addMale(input, brotherVouch, -1, name, key)' class="button is-info" :disabled="(!paid_bill || party_closed) && !social">Add Male(s)</button>
         </div>
-        <div class="addGuest">
+        <div class="addGuest" v-if="allowVouching || !party_closed">
           <button v-on:click='addFemale(input, brotherVouch, -1, name, key)' class="button is-danger" :disabled="(!paid_bill || party_closed) && !social" style="margin-left: 20px;">
             Add Female(s)
           </button>
@@ -102,6 +96,7 @@
           </tbody>
         </table>
       </div>
+
       <div class="column is-half">
         <h4 class="title has-text-centered is-4">Females</h4>
         <table class="table is-fullwidth">
@@ -142,8 +137,25 @@
       </div>
     </div>
 
+    <!-- BLACKLIST -->
+    <div v-if="isFrontDoor">
+      <h4 class="title has-text-centered is-4">Blacklist</h4>
+      <table class="table is-fullwidth is-striped">
+        <thead>
+        <tr>
+          <th>Name</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="person in blacklist">
+          <td>{{person}}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
     <!-- APPROVAL LIST -->
-    <div class="columns">
+    <div class="columns" v-if="!isFrontDoor">
       <div class="column is-half">
         <h4 class="title has-text-centered is-4">Males Awaiting Approval</h4>
         <table class="table is-fullwidth">
@@ -204,7 +216,7 @@
 
 
     <!-- PERSONAL LIST -->
-    <div class="columns">
+    <div class="columns" v-if="!isFrontDoor">
       <div class="column is-half">
         <h4 class="title has-text-centered is-4">Your list of Males</h4>
         <table class="table is-fullwidth">
@@ -241,6 +253,11 @@
           </tbody>
         </table>
       </div>
+    </div>
+    <div v-if="!isFrontDoor" >
+      <button class="button is-info" v-on:click='downloadSpreadsheet()'>
+        Download Spreadsheet
+      </button>
     </div>
   </section>
 </template>
