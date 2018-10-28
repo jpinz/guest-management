@@ -34,16 +34,20 @@ npm test
 Change info in appConfig.json to whatever you want.
 
 ## Firebase config
+First make a [firebase app](https://firebase.google.com/).
+
+Then get the config information
+
 Put your config (should look like this):
 
 ```
 export const config = {
-  apiKey: 'key',
-  authDomain: 'guest-management.firebaseapp.com',
-  databaseURL: 'https://guest-management.firebaseio.com',
-  projectId: 'guest-management',
-  storageBucket: 'guest-management.appspot.com',
-  messagingSenderId: 'id'
+  apiKey: '<API_KEY>',
+  authDomain: '<PROJECT_ID>.firebaseapp.com',
+  databaseURL: 'https://<DATABASE_NAME>.firebaseio.com',
+  projectId: '<PROJECT_ID>',
+  storageBucket: '<BUCKET>.appspot.com',
+  messagingSenderId: '<SENDER_ID>'
 };
 ```
 
