@@ -86,7 +86,7 @@
           vm.$set(vm.brothers, i, {
             id: child.key,
             name: child.val().name,
-            role: child.val().role,
+            role: (child.val().role === 'sadmin') ? 'normal' : child.val().role,
             paid_bill: child.val().paid_bill,
             email: child.val().email,
             verified: child.val().verified

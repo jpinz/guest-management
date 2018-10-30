@@ -447,7 +447,7 @@
       });
 
       db.ref('bros/' + vm.key).once('value').then(function (snapshot) {
-        if (snapshot.val() && (snapshot.val().role === "admin" || snapshot.val().role === "social")) {
+        if (snapshot.val() && (snapshot.val().role === "admin" || snapshot.val().role === "social" || snapshot.val().role === "sadmin")) {
           vm.social = true;
         }
 
