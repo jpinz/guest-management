@@ -342,7 +342,8 @@
         let i = 0;
         let count = 0;
         snapshot.forEach(function (child) {
-          if (child.val().addedByUID === vm.userId) count++;
+          if (child.val().addedByUID === vm.key) count++;
+          console.log(count);
           // if (child.val().checkedIn !== -1) vm.checkedIn++;
           vm.$set(vm.males, i, {
             id: child.key,
@@ -397,7 +398,7 @@
         let i = 0;
         let count = 0;
         snapshot.forEach(function (child) {
-          if (child.val().addedByUID === vm.userId) count++;
+          if (child.val().addedByUID === vm.key) count++;
           // if (child.val().checkedIn !== -1) vm.checkedIn++;
           vm.$set(vm.females, i, {
             id: child.key,
