@@ -116,6 +116,22 @@
         vm.userId = this.$store.state.uid
       }
 
+      db.ref('bros/' + vm.userId).once('value').then(function(snapshot) {
+        var name = (snapshot.val() && snapshot.val().name);
+
+        if(name !== user.displayName) {
+          user.updateProfile({
+            displayName: name
+          }).then(function() {
+            console.log("Updated your name to the one in the database: " + name);
+          }, function(error) {
+            // An error happened.
+            console.log(error);
+          });
+        }
+      });
+
+
       var eventsRef = db.ref('events/');
       eventsRef.on('value', function (snapshot) {
         let currEvents = snapshot.val();

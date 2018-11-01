@@ -7,6 +7,7 @@
     <br/><br/>
 
     <p>There are currently {{brothers.length}} brothers with accounts.</p>
+
     <table class="table is-fullwidth is-striped">
       <thead>
       <tr>
@@ -77,7 +78,6 @@
         vm.name = user.displayName;
         vm.email = user.email;
         vm.userId = this.$store.state.uid;
-
       }
 
       db.ref('bros/').orderByChild('sortKey').on('value', (snapshot) => {
@@ -90,6 +90,7 @@
             paid_bill: child.val().paid_bill,
             email: child.val().email,
             verified: child.val().verified
+            //list: child.val().list NOTE: uncomment to do an update to everyone's userlist
           });
           i++;
           if(!child.val().verified) {
@@ -116,7 +117,6 @@
           vm.broNames = snapshot.val();
         }
       });
-
     },
     methods: {
       update: function (key, id, value) {
@@ -137,6 +137,46 @@
         if (deletion) {
           db.ref('bros/' + id).remove();
         }
+      },
+      updateGuests: function() {
+        console.log("Updating guests")
+        let vm = this;
+        let brothers = vm.brothers;
+        for (let i = 0; i < brothers.length; i++) {
+          let key = brothers[i].email.substr(0, brothers[i].email.indexOf('@'))
+          if(!brothers[i].list) {
+            console.log(brothers[i].name + " doesn't have any users on their list.");
+            continue;
+          }
+
+          if(brothers[i].list.females) {
+            Object.keys(brothers[i].list.females).forEach(function(uid) {
+              console.log(brothers[i].list.females[uid].name);
+              brothers[i].list.females[uid].addedByUID = key;
+
+              let sortKeyArr = brothers[i].list.females[uid].name.toUpperCase().split(' ');
+              let sortKey = sortKeyArr.splice(1).join('') + sortKeyArr[0];
+              brothers[i].list.females[uid].sortKey = sortKey;
+            });
+          }
+
+          if(brothers[i].list.males) {
+            Object.keys(brothers[i].list.males).forEach(function(uid) {
+              console.log(brothers[i].list.males[uid].name);
+              brothers[i].list.males[uid].addedByUID = key;
+
+              let sortKeyArr = brothers[i].list.males[uid].name.toUpperCase().split(' ');
+              let sortKey = sortKeyArr.splice(1).join('') + sortKeyArr[0];
+              console.log(sortKey);
+              brothers[i].list.males[uid].sortKey = sortKey;
+            });
+          }
+          firebase.database().ref('bros/' + key).update({
+            'list': brothers[i].list
+          });
+        }
+
+
       }
     },
   };

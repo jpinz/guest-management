@@ -178,7 +178,7 @@
               <button v-on:click="remove(male, true, index, true)" class="button is-link">Delete</button>
             </th>
             <th v-else-if="!isFrontDoor && male.addedByName === name">
-              <button v-on:click="remove(male, true, index, false)" class="button is-link">Delete</button>
+              <button v-on:click="remove(male, true, index, true)" class="button is-link">Delete</button>
             </th>
           </tr>
           </tbody>
@@ -206,7 +206,7 @@
               <button v-on:click="remove(female, false, index, true)" class="button is-link">Delete</button>
             </th>
             <th v-else-if="!isFrontDoor && female.addedByName === name">
-              <button v-on:click="remove(female, false, index, false)" class="button is-link">Delete</button>
+              <button v-on:click="remove(female, false, index, true)" class="button is-link">Delete</button>
             </th>
           </tr>
           </tbody>
@@ -275,6 +275,7 @@
         email: '',
         key: '',
         social: false,
+        admin: false,
         paid_bill: true,
         isFrontDoor: false,
         party_name: '',
@@ -343,7 +344,6 @@
         let count = 0;
         snapshot.forEach(function (child) {
           if (child.val().addedByUID === vm.key) count++;
-          console.log(count);
           // if (child.val().checkedIn !== -1) vm.checkedIn++;
           vm.$set(vm.males, i, {
             id: child.key,
@@ -447,7 +447,13 @@
       });
 
       db.ref('bros/' + vm.key).once('value').then(function (snapshot) {
-        if (snapshot.val() && (snapshot.val().role === "admin" || snapshot.val().role === "social" || snapshot.val().role === "sadmin")) {
+        if (snapshot.val() && (snapshot.val().role === "admin" || snapshot.val().role === "sadmin")) {
+          vm.admin = true;
+          vm.social = true;
+
+        }
+
+        if (snapshot.val() && (snapshot.val().role === "social")) {
           vm.social = true;
         }
 
@@ -567,22 +573,50 @@
         let db = firebase.database();
         let vm = this;
         console.log("adding: " + guest.name);
+
         if (isMale) {
           let addr = 'events/' + this.$route.params.id + '/males';
+          if (vm.blacklist.includes(guest.name.toLowerCase())) {
+            alert(guest.name + " is on the blacklist! They will not be added to the guest list.");
+          } else if (vm.males.some(e => e.name.toLowerCase() === guest.name.toLowerCase())) {
+            console.log(guest.name + " has already been added.");
+          } else {
+            if ((vm.malesAdded >= vm.maleLimit || vm.generalAdded >= vm.generalLimit) && !vm.admin) {
+              db.ref('bros/' + vm.key + '/list/males/' + guest.id).once("value", function (snapshot) {
+                let male = snapshot.val();
+                db.ref(addr + '_approval/' + guest.id).set(male);
+              });
+              alert("You hit your maximum for male guests, they've been added to the approval list")
 
-          db.ref('bros/' + vm.key+ '/list/males/' + guest.id).once("value", function (snapshot) {
-            let male = snapshot.val();
-            db.ref(addr + '/' + guest.id).set(male);
-            vm.malesAdded++;
-          });
+            } else {
+              db.ref('bros/' + vm.key + '/list/males/' + guest.id).once("value", function (snapshot) {
+                let male = snapshot.val();
+                db.ref(addr + '/' + guest.id).set(male);
+                vm.malesAdded++;
+              });
+            }
+          }
         } else {
           let addr = 'events/' + this.$route.params.id + '/females';
-
-          db.ref('bros/' + vm.key+ '/list/females/' + guest.id).once("value", function (snapshot) {
-            let female = snapshot.val();
-            db.ref(addr + '/' + guest.id).set(female);
-            vm.femalesAdded++;
-          });
+          if (vm.blacklist.includes(guest.name.toLowerCase())) {
+            alert(guest.name + " is on the blacklist! They will not be added to the guest list.");
+          } else if (vm.females.some(e => e.name.toLowerCase() === guest.name.toLowerCase())) {
+            console.log(guest.name + " has already been added.");
+          } else {
+            if ((vm.femalesAdded >= vm.femaleLimit || vm.generalAdded >= vm.generalLimit) && !vm.admin) {
+              db.ref('bros/' + vm.key + '/list/females/' + guest.id).once("value", function (snapshot) {
+                let female = snapshot.val();
+                db.ref(addr + '_approval/' + guest.id).set(female);
+              });
+              alert("You hit your maximum for female guests, they've been added to the approval list")
+            } else {
+              db.ref('bros/' + vm.key + '/list/females/' + guest.id).once("value", function (snapshot) {
+                let female = snapshot.val();
+                db.ref(addr + '/' + guest.id).set(female);
+                vm.femalesAdded++;
+              });
+            }
+          }
         }
       },
       remove: function (guest, isMale, index, approvalList) {
@@ -594,28 +628,32 @@
           return
         }
 
-        console.log("Removing guest: " + guest.name);
 
         if (approvalList) {
           if (isMale) {
+            console.log("Removing male guest: " + guest.name + " from approval list.");
+
             let addr = 'events/' + this.$route.params.id + '/males_approval/';
             this.malesApproval.splice(index, 1);
 
             db.ref(addr + guest.id).remove();
           } else {
+            console.log("Removing female guest: " + guest.name + " from approval list.");
+
             let addr = 'events/' + this.$route.params.id + '/females_approval/';
             this.femalesApproval.splice(index, 1);
-
             db.ref(addr + guest.id).remove();
           }
         } else {
           if (isMale) {
+            console.log("Removing male guest: " + guest.name + ".");
             let addr = 'events/' + this.$route.params.id + '/males/';
             this.males.splice(index, 1);
 
             db.ref(addr + guest.id).remove();
             vm.malesAdded--;
           } else {
+            console.log("Removing female guest: " + guest.name + ".");
             let addr = 'events/' + this.$route.params.id + '/females/';
             this.females.splice(index, 1);
 
@@ -655,7 +693,7 @@
           } else if (!name || name === undefined || name === "" || name.length === 0) {
             console.log("Name was empty, didn't add");
           } else {
-            if ((vm.malesAdded >= vm.maleLimit || vm.generalAdded >= vm.generalLimit) && !vm.social) {
+            if ((vm.malesAdded >= vm.maleLimit || vm.generalAdded >= vm.generalLimit) && !vm.admin) {
               hitLimit = true;
               let newMaleId = db.ref().push().key;
               db.ref(addr + '_approval/' + newMaleId).set({
@@ -709,7 +747,7 @@
           } else if (!name || name === undefined || name === "" || name.length === 0) {
             console.log("Name was empty, didn't add");
           } else {
-            if ((vm.femalesAdded >= vm.femaleLimit || vm.generalAdded >= vm.generalLimit) && !vm.social) {
+            if ((vm.femalesAdded >= vm.femaleLimit || vm.generalAdded >= vm.generalLimit) && !vm.admin) {
               hitLimit = true;
               let newFemaleId = db.ref().push().key;
               db.ref(addr + '_approval/' + newFemaleId).set({
