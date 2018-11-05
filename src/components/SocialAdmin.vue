@@ -12,7 +12,7 @@
       <thead>
       <tr>
         <th>Name</th>
-        <th>Paid Bill</th>
+        <th>Allowed to add</th>
         <th>Role</th>
         <th v-if="role === 'admin'">Verify Account</th>
         <th v-if="role === 'admin'">Delete User</th>

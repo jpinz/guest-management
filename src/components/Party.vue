@@ -23,10 +23,13 @@
           <br/>
         </div>
         <input v-model="input" class="input" type="text" placeholder="Enter guest name(s)" id="searchbar">
-        <div v-if="isFrontDoor && allowVouching">
+        <div v-if="isFrontDoor && (allowVouching || admin)">
           <br/>
+          <span>Auto Check-In enabled: </span>
+          <b-switch v-model="autoCheckin">
+          </b-switch>
         </div>
-        <b-field label="Add brother to vouch for guest" v-if="isFrontDoor && allowVouching">
+        <b-field label="Add brother to vouch for guest" v-if="isFrontDoor && (allowVouching || admin)">
           <b-autocomplete
             v-model="brotherVouch"
             :data="filteredBrothersList"
@@ -39,10 +42,10 @@
           </b-autocomplete>
         </b-field>
         <br/>
-        <div class="addGuest" v-if="allowVouching || !party_closed">
+        <div class="addGuest" v-if="allowVouching || !party_closed || admin">
           <button v-on:click='addMale(input, brotherVouch, -1, name, key)' class="button is-info" :disabled="(!paid_bill || party_closed) && !social">Add Male(s)</button>
         </div>
-        <div class="addGuest" v-if="allowVouching || !party_closed">
+        <div class="addGuest" v-if="allowVouching || !party_closed || admin">
           <button v-on:click='addFemale(input, brotherVouch, -1, name, key)' class="button is-danger" :disabled="(!paid_bill || party_closed) && !social" style="margin-left: 20px;">
             Add Female(s)
           </button>
@@ -55,6 +58,12 @@
         males for a total of <strong>{{malesAdded + femalesAdded}}</strong> added.</p>
       <p v-else>You have added <strong>{{femalesAdded}}</strong> females and <strong>{{malesAdded}}</strong>
         males for a total of <strong>{{malesAdded + femalesAdded}}/{{generalLimit}}</strong> added.</p>
+      <br/>
+      <p v-if="females.length + males.length != femalesApproval.length + malesApproval.length">If everyone from the
+        approval list was added, there would be <strong>{{females.length + femalesApproval.length}}</strong>
+        females and <strong>{{males.length + malesApproval.length}}</strong>
+        males on the list. For a total of <strong>{{females.length + males.length + femalesApproval.length
+          + malesApproval.length}}</strong> guests.</p>
       <p>There are <strong>{{checkedIn}}</strong> guests who have checked in.</p>
     </div>
 
@@ -154,8 +163,13 @@
       </table>
     </div>
 
+    <div>
+      <p>There are <strong>{{femalesApproval.length}}</strong> females and <strong>{{malesApproval.length}}</strong>
+        males on the approval list. For you math majors that is <strong>{{femalesApproval.length + malesApproval.length}}</strong> guests.</p>
+    </div>
+
     <!-- APPROVAL LIST -->
-    <div class="columns" v-if="!isFrontDoor">
+    <div class="columns">
       <div class="column is-half">
         <h4 class="title has-text-centered is-4">Males Awaiting Approval</h4>
         <table class="table is-fullwidth">
@@ -284,6 +298,7 @@
         party_type: '',
         party_closed: false,
         allowVouching: false,
+        autoCheckin: false,
         input: '',
         brotherVouch: '',
         broNames: [],
@@ -581,7 +596,7 @@
           } else if (vm.males.some(e => e.name.toLowerCase() === guest.name.toLowerCase())) {
             console.log(guest.name + " has already been added.");
           } else {
-            if ((vm.malesAdded >= vm.maleLimit || vm.generalAdded >= vm.generalLimit) && !vm.admin) {
+            if ((vm.malesAdded >= vm.maleLimit || vm.generalAdded >= vm.generalLimit)) {
               db.ref('bros/' + vm.key + '/list/males/' + guest.id).once("value", function (snapshot) {
                 let male = snapshot.val();
                 db.ref(addr + '_approval/' + guest.id).set(male);
@@ -603,7 +618,7 @@
           } else if (vm.females.some(e => e.name.toLowerCase() === guest.name.toLowerCase())) {
             console.log(guest.name + " has already been added.");
           } else {
-            if ((vm.femalesAdded >= vm.femaleLimit || vm.generalAdded >= vm.generalLimit) && !vm.admin) {
+            if (vm.femalesAdded >= vm.femaleLimit || vm.generalAdded >= vm.generalLimit) {
               db.ref('bros/' + vm.key + '/list/females/' + guest.id).once("value", function (snapshot) {
                 let female = snapshot.val();
                 db.ref(addr + '_approval/' + guest.id).set(female);
@@ -627,7 +642,6 @@
         if(!del) {
           return
         }
-
 
         if (approvalList) {
           if (isMale) {
@@ -681,6 +695,7 @@
           return
         } else if(brotherVouch) {
           addedByName = brotherVouch
+          addedByUID = "Vouched by: " + brotherVouch
         }
 
         names.every(function (name) {
@@ -693,7 +708,7 @@
           } else if (!name || name === undefined || name === "" || name.length === 0) {
             console.log("Name was empty, didn't add");
           } else {
-            if ((vm.malesAdded >= vm.maleLimit || vm.generalAdded >= vm.generalLimit) && !vm.admin) {
+            if ((vm.malesAdded >= vm.maleLimit || vm.generalAdded >= vm.generalLimit) && (!vm.admin && !vm.party_closed)) {
               hitLimit = true;
               let newMaleId = db.ref().push().key;
               db.ref(addr + '_approval/' + newMaleId).set({
@@ -704,16 +719,26 @@
               });
             } else {
               let newMaleId = db.ref().push().key;
-              db.ref(addr + '/' + newMaleId).set({
-                name: name,
-                checkedIn: checkedIn,
-                addedByName: addedByName,
-                addedByUID: addedByUID
-              });
+              if(vm.autoCheckin) {
+                db.ref(addr + '/' + newMaleId).set({
+                  name: name,
+                  checkedIn: new Date().getTime(),
+                  addedByName: addedByName,
+                  addedByUID: addedByUID
+                });
+              } else {
+                db.ref(addr + '/' + newMaleId).set({
+                  name: name,
+                  checkedIn: checkedIn,
+                  addedByName: addedByName,
+                  addedByUID: addedByUID
+                });
+              }
               db.ref('bros/' + vm.key + '/events/' + vm.party_id).set({
                 males: vm.malesAdded,
                 females: vm.femalesAdded
               });
+
             }
           }
           return true;
@@ -747,7 +772,7 @@
           } else if (!name || name === undefined || name === "" || name.length === 0) {
             console.log("Name was empty, didn't add");
           } else {
-            if ((vm.femalesAdded >= vm.femaleLimit || vm.generalAdded >= vm.generalLimit) && !vm.admin) {
+            if ((vm.femalesAdded >= vm.femaleLimit || vm.generalAdded >= vm.generalLimit) && (!vm.admin && !vm.party_closed)) {
               hitLimit = true;
               let newFemaleId = db.ref().push().key;
               db.ref(addr + '_approval/' + newFemaleId).set({
@@ -758,12 +783,21 @@
               });
             } else {
               let newFemaleId = db.ref().push().key;
-              db.ref(addr + '/' + newFemaleId).set({
-                name: name,
-                checkedIn: checkedIn,
-                addedByName: addedByName,
-                addedByUID: addedByUID
-              });
+              if(vm.autoCheckin) {
+                db.ref(addr + '/' + newFemaleId).set({
+                  name: name,
+                  checkedIn: new Date().getTime(),
+                  addedByName: addedByName,
+                  addedByUID: addedByUID
+                });
+              } else {
+                db.ref(addr + '/' + newFemaleId).set({
+                  name: name,
+                  checkedIn: checkedIn,
+                  addedByName: addedByName,
+                  addedByUID: addedByUID
+                });
+              }
 
               db.ref('bros/' + vm.key + '/events/' + vm.party_id).set({
                 males: vm.malesAdded,
