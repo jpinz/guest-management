@@ -36,9 +36,9 @@ Change info in appConfig.json to whatever you want.
 ## Firebase config
 First make a [firebase app](https://firebase.google.com/).
 
-Then get the config information
+Make sure you enable firebase email/password authentication: https://console.firebase.google.com/project/fraternity-parties/authentication/providers
 
-Put your config (should look like this):
+Then get the config information, from https://console.firebase.google.com/project/fraternity-parties/settings/general/ scroll to the bottom and click the icon named "Add Firebase to your web app", then copy from `apiKey` to the end of the `messagingSenderId` line, and paste in a javascript filewith the following structure:
 
 ```
 export const config = {
@@ -53,4 +53,23 @@ export const config = {
 
 into a file called `firebaseConfig.js` in `src/config`
 
-Make sure you enable firebase email/password authentication too!
+## How to finish the setup and deploy the site:
+
+1. firebase init
+2. Yes project
+3. check Database, functions. hosting, and storage
+4. select your project (if issue, make sure there's no .firebaserc)
+5. yes on database.json
+6. no on overwrite
+7. yes on javascript
+8. no on eslint
+9. no on override functions/package.json
+10. no on override functions/index.js
+11. yes on install dependencies
+12. instead of public chose dist as directory
+13. No on single page
+14. enter on storage.rules
+
+**then run `npm run build` followed by `firebase deploy`**
+
+Then your site should be available at http://name-of-project.firebaseapp.com
