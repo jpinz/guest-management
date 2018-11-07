@@ -52,3 +52,5 @@ export const config = {
 ```
 
 into a file called `firebaseConfig.js` in `src/config`
+
+Make sure you enable firebase email/password authentication too!
