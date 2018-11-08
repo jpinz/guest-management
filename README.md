@@ -33,7 +33,10 @@ npm test
 ## Normal config
 Change info in appConfig.json to whatever you want.
 
-## Firebase config
+## Firebase
+
+You must have the [Firebase CLI](https://firebase.google.com/docs/cli/) installed. If you don't have it install it with `npm install -g firebase-tools` and then configure it with `firebase login`.
+
 First make a [firebase app](https://firebase.google.com/).
 
 Make sure you enable firebase email/password authentication: https://console.firebase.google.com/project/fraternity-parties/authentication/providers
@@ -73,3 +76,7 @@ into a file called `firebaseConfig.js` in `src/config`
 **then run `npm run build` followed by `firebase deploy`**
 
 Then your site should be available at http://name-of-project.firebaseapp.com
+
+## Issues
+
+Please report any issues found on the issues page here on github, or to me directly. Thanks!
