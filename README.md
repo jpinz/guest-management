@@ -2,6 +2,8 @@
 
 > Guest List management website for social events.
 
+First get **npm** from https://www.npmjs.com/get-npm
+
 ## Build Setup
 
 ``` bash
