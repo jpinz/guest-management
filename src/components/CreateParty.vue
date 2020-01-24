@@ -36,7 +36,7 @@
       <br/>
       <label class="label">Number of Male Guests per Brother</label>
       <div class="control">
-        <input v-model="maleGuestCount" class="input" type="number" :disabled="generalGuestCount != 0"
+        <input v-model="maleGuestCount" class="input" type="number"   "
                placeholder="Number">
       </div>
 
@@ -80,6 +80,7 @@
 
 <script>
   import firebase from 'firebase'
+  import moment from 'moment'
 
   export default {
     data () {
@@ -231,7 +232,7 @@
             let a = document.createElement('a')
             let file = new Blob([JSON.stringify(snapshot.val(), null, 2)], {type: 'application/json'})
             let storageRef = firebase.storage().ref()
-            let dataRef = storageRef.child(vm.name.replace(' ', '_') + '_data.json')
+            let dataRef = storageRef.child(vm.name.replace(' ', '_') + '_' + moment(vm.party_date).format("M_D_YY") + '_data.json')
             dataRef.put(file).then(function (snapshot) {
               console.log('Uploaded a blob or file!')
             })

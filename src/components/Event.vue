@@ -70,7 +70,8 @@
     <div class="columns">
       <div class="column is-half">
         <h4 class="title has-text-centered is-4">Males</h4>
-        <table class="table is-fullwidth">
+        <Guests isMale=true :isFrontDoor="isFrontDoor" :social="social" :guests="filteredMales" />
+        <!-- <table class="table is-fullwidth">
           <thead>
           <tr>
             <th>Name</th>
@@ -98,12 +99,12 @@
             <th v-if="!isFrontDoor && social">
               <button v-on:click="remove(male, true, index, false)" class="button is-link">Delete</button>
             </th>
-            <th v-else-if="!isFrontDoor && male.addedByName === name">
+            <th v-else-if="!isFrontDoor && male.addedByUID === key">
               <button v-on:click="remove(male, true, index, false)" class="button is-link">Delete</button>
             </th>
           </tr>
           </tbody>
-        </table>
+        </table> -->
       </div>
 
       <div class="column is-half">
@@ -137,7 +138,7 @@
             <th v-if="!isFrontDoor && social">
               <button v-on:click="remove(female, false, index, false)" class="button is-link">Delete</button>
             </th>
-            <th v-else-if="!isFrontDoor && female.addedByName === name">
+            <th v-else-if="!isFrontDoor && female.addedByUID === key">
               <button v-on:click="remove(female, false, index, false)" class="button is-link">Delete</button>
             </th>
           </tr>
@@ -191,7 +192,7 @@
             <th v-if="!isFrontDoor && social">
               <button v-on:click="remove(male, true, index, true)" class="button is-link">Delete</button>
             </th>
-            <th v-else-if="!isFrontDoor && male.addedByName === name">
+            <th v-else-if="!isFrontDoor && male.addedByUID === key">
               <button v-on:click="remove(male, true, index, true)" class="button is-link">Delete</button>
             </th>
           </tr>
@@ -219,7 +220,7 @@
             <th v-if="!isFrontDoor && social">
               <button v-on:click="remove(female, false, index, true)" class="button is-link">Delete</button>
             </th>
-            <th v-else-if="!isFrontDoor && female.addedByName === name">
+            <th v-else-if="!isFrontDoor && female.addedByUID === key">
               <button v-on:click="remove(female, false, index, true)" class="button is-link">Delete</button>
             </th>
           </tr>
@@ -268,6 +269,27 @@
         </table>
       </div>
     </div>
+    <!--<div>
+      <h4 class="title has-text-centered is-4">Guest count per brother</h4>
+      <table class="table is-fullwidth">
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>Male</th>
+          <th>Female</th>
+          <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(brother, name) in broCount">
+          <th>{{name}}</th>
+          <td>{{brother.male}}</td>
+          <td>{{brother.female}}</td>
+          <td>{{brother.female + brother.male}}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>-->
     <div v-if="!isFrontDoor" >
       <button class="button is-info" v-on:click='downloadSpreadsheet()'>
         Download Spreadsheet
@@ -280,8 +302,14 @@
   import firebase from 'firebase'
   import moment from 'moment'
   import XLSX from 'xlsx'
+  import getSortKey from '../utils/sortKeyGen'
+  import Guests from "@/components/Guests";
 
   export default {
+      name: "Event",
+      components: {
+          Guests
+      },
     data() {
       return {
         userId: '',
@@ -302,6 +330,8 @@
         input: '',
         brotherVouch: '',
         broNames: [],
+        broCount: {},
+        stats: [],
         blacklist: [],
         males: [],
         females: [],
@@ -333,6 +363,9 @@
       const eventRef = db.ref('events/' + this.$route.params.id);
       eventRef.on('value', (snapshot) => {
         let event = snapshot.val();
+        if(!event) {
+          vm.$router.push('dashboard');
+        }
         vm.party_type = this.capitalize(event.type);
         vm.party_date = moment(event.party_date).format("ddd, MMM Do YYYY");
         vm.party_name = event.name;
@@ -353,7 +386,13 @@
         });
       });
 
-      const malesRef = db.ref('events/' + this.$route.params.id + '/males');
+      db.ref('brotherNames').once('value').then(function (snapshot) {
+        if(snapshot.val()) {
+          vm.broNames = snapshot.val();
+        }
+      });
+
+      const malesRef = db.ref(`events/${this.$route.params.id}/males`);
       malesRef.orderByChild('sortKey').on('value', (snapshot) => {
         let i = 0;
         let count = 0;
@@ -367,14 +406,24 @@
             addedByName: child.val().addedByName,
             addedByUID: child.val().addedByUID
           });
+          //This code is to fix sortKeys
+          // console.log(child.val().name);
+          // db.ref(`events/${vm.$route.params.id}/males` + `/` + child.key).update({'sortKey': getSortKey(child.val().name)});
+
+          if(!vm.broCount[child.val().addedByName]) {
+            vm.broCount[child.val().addedByName] = {
+              'male': 0,
+              'female': 0,
+              'total': 0
+            }
+          }
+          vm.broCount[child.val().addedByName]["male"]++;
+          vm.broCount[child.val().addedByName]["total"]++;
           i++;
         });
         vm.malesAdded = count;
         vm.generalAdded = vm.malesAdded + vm.femalesAdded;
 
-        db.ref('bros/' + vm.key + '/events/' + vm.party_id).update({
-          males: vm.malesAdded
-        });
       });
 
       const malesApprovalRef = db.ref('events/' + this.$route.params.id + '/males_approval');
@@ -422,14 +471,24 @@
             addedByName: child.val().addedByName,
             addedByUID: child.val().addedByUID
           });
+
+          //This code is to fix sortKeys
+          // console.log(child.val().name);
+          // db.ref(`events/${vm.$route.params.id}/females` + `/` + child.key).update({'sortKey': getSortKey(child.val().name)});
+
+          if(!vm.broCount[child.val().addedByName]) {
+            vm.broCount[child.val().addedByName] = {
+              'male': 0,
+              'female': 0,
+              'total': 0
+            }
+          }
+          vm.broCount[child.val().addedByName]["female"]++;
+          vm.broCount[child.val().addedByName]["total"]++;
           i++;
         });
         vm.femalesAdded = count;
         vm.generalAdded = vm.malesAdded + vm.femalesAdded;
-
-        db.ref('bros/' + vm.key + '/events/' + vm.party_id).update({
-          females: vm.femalesAdded
-        });
       });
 
       const femalesApprovalRef = db.ref('events/' + this.$route.params.id + '/females_approval');
@@ -465,7 +524,6 @@
         if (snapshot.val() && (snapshot.val().role === "admin" || snapshot.val().role === "sadmin")) {
           vm.admin = true;
           vm.social = true;
-
         }
 
         if (snapshot.val() && (snapshot.val().role === "social")) {
@@ -474,13 +532,7 @@
 
         vm.paid_bill = snapshot.val() && snapshot.val().paid_bill === true;
       });
-
-      db.ref('brotherNames').once('value').then(function (snapshot) {
-        if(snapshot.val()) {
-          vm.broNames = snapshot.val();
-        }
-      });
-
+      console.log(Object.values(vm.broCount));
     },
     computed: {
       filteredMales() {
@@ -495,12 +547,16 @@
       },
       filteredMalesApproval() {
         return this.malesApproval.filter(male => {
-          return (male.name.toLowerCase().indexOf(this.input.toLowerCase()) > -1) || (male.addedByName.toLowerCase().indexOf(this.input.toLowerCase()) > -1)
+          if(male.name) {
+            return (male.name.toLowerCase().indexOf(this.input.toLowerCase()) > -1) || (male.addedByName.toLowerCase().indexOf(this.input.toLowerCase()) > -1)
+          }
         })
       },
       filteredFemalesApproval() {
         return this.femalesApproval.filter(female => {
-          return (female.name.toLowerCase().indexOf(this.input.toLowerCase()) > -1) || (female.addedByName.toLowerCase().indexOf(this.input.toLowerCase()) > -1)
+          if(female.name) {
+            return (female.name.toLowerCase().indexOf(this.input.toLowerCase()) > -1) || (female.addedByName.toLowerCase().indexOf(this.input.toLowerCase()) > -1)
+          }
         })
       },
       filteredMalesList() {
@@ -674,10 +730,6 @@
             db.ref(addr + guest.id).remove();
             vm.femalesAdded--;
           }
-          db.ref('bros/' + vm.key + '/events/' + vm.party_id).set({
-            males: vm.malesAdded,
-            females: vm.femalesAdded
-          });
         }
       },
       addMale: function (nameInput, brotherVouch, checkedIn, addedByName, addedByUID) {
@@ -715,7 +767,8 @@
                 name: name,
                 checkedIn: checkedIn,
                 addedByName: addedByName,
-                addedByUID: addedByUID
+                addedByUID: addedByUID,
+                sortKey: getSortKey(name)
               });
             } else {
               let newMaleId = db.ref().push().key;
@@ -724,21 +777,18 @@
                   name: name,
                   checkedIn: new Date().getTime(),
                   addedByName: addedByName,
-                  addedByUID: addedByUID
+                  addedByUID: addedByUID,
+                  sortKey: getSortKey(name)
                 });
               } else {
                 db.ref(addr + '/' + newMaleId).set({
                   name: name,
                   checkedIn: checkedIn,
                   addedByName: addedByName,
-                  addedByUID: addedByUID
+                  addedByUID: addedByUID,
+                  sortKey: getSortKey(name)
                 });
               }
-              db.ref('bros/' + vm.key + '/events/' + vm.party_id).set({
-                males: vm.malesAdded,
-                females: vm.femalesAdded
-              });
-
             }
           }
           return true;
@@ -779,7 +829,8 @@
                 name: name,
                 checkedIn: checkedIn,
                 addedByName: addedByName,
-                addedByUID: addedByUID
+                addedByUID: addedByUID,
+                sortKey: getSortKey(name)
               });
             } else {
               let newFemaleId = db.ref().push().key;
@@ -788,21 +839,18 @@
                   name: name,
                   checkedIn: new Date().getTime(),
                   addedByName: addedByName,
-                  addedByUID: addedByUID
+                  addedByUID: addedByUID,
+                  sortKey: getSortKey(name)
                 });
               } else {
                 db.ref(addr + '/' + newFemaleId).set({
                   name: name,
                   checkedIn: checkedIn,
                   addedByName: addedByName,
-                  addedByUID: addedByUID
+                  addedByUID: addedByUID,
+                  sortKey: getSortKey(name)
                 });
               }
-
-              db.ref('bros/' + vm.key + '/events/' + vm.party_id).set({
-                males: vm.malesAdded,
-                females: vm.femalesAdded
-              });
             }
           }
           return true;

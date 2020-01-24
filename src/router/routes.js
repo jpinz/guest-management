@@ -3,11 +3,12 @@ import SignUp from '../components/SignUp.vue';
 import Error404 from '../components/Error404.vue';
 import Dashboard from '../components/Dashboard.vue';
 import Account from '../components/Account.vue';
-import Party from '../components/Party.vue';
+import Event from '../components/Event.vue';
 import CreateParty from '../components/CreateParty.vue';
 import SocialAdmin from '../components/SocialAdmin.vue';
 import Blacklist from '../components/Blacklist.vue';
 import UserList from '../components/UserList.vue';
+// import DeletedParties from '../components/DeletedParties.vue';
 
 // This is where you add all your site routes
 // Each route is set as an object in the array
@@ -16,9 +17,10 @@ import UserList from '../components/UserList.vue';
 
 export const routes = [
   //Redirects
-  {path: '/party/account', redirect: '/account'},
-  {path: '/party/social', redirect: '/social'},
-  {path: '/party/userlist', redirect: '/userlist'},
+  {path: '/event/account', redirect: '/account'},
+  {path: '/event/social', redirect: '/social'},
+  {path: '/event/userlist', redirect: '/userlist'},
+  {path: '/event/dashboard', redirect: '/dashboard'},
 
   {path: '/social/account', redirect: '/account'},
   {path: '/social/social', redirect: '/social'},
@@ -37,7 +39,7 @@ export const routes = [
   },
   {
     path: '',
-    name: 'parties',
+    name: 'dashboard',
     component: Dashboard,
     meta: {
       requiresAuth: true
@@ -77,10 +79,19 @@ export const routes = [
       requiresSocial: true,
     }
   },
+  // {
+  //   path: '/social/deletedparties',
+  //   name: 'deletedparties',
+  //   component: DeletedParties,
+  //   meta: {
+  //     requiresAuth: true,
+  //     requiresSocial: true,
+  //   }
+  // },
   {
-    path: '/party/:id',
-    name: 'party',
-    component: Party,
+    path: '/event/:id',
+    name: 'event',
+    component: Event,
     meta: {
       requiresAuth: true
     }

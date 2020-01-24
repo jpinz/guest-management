@@ -4,7 +4,7 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
 
-// // Create and Deploy Your First Cloud Functions
+/*// // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 //
 // exports.helloWorld = functions.https.onRequest((request, response) => {
@@ -69,7 +69,7 @@ exports.femaleApprovalSortkey = functions.database.ref('/events/{eventID}/female
     // writing to the Firebase Realtime Database.
     // Setting an "uppercase" sibling in the Realtime Database returns a Promise.
     return snapshot.ref.child('sortKey').set(sortKey);
-  });
+  });*/
 
 // Listens for brothers added to the site in  /bros/:email and creates a
 // sortkey for the guest in /bros/:email/sortKey

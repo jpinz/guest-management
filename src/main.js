@@ -6,7 +6,7 @@ import {store} from './store/store';
 import {routes} from './router/routes';
 import {config} from "./config/firebaseConfig";
 import Buefy from 'buefy'
-import 'buefy/lib/buefy.css'
+import 'buefy/dist/buefy.css'
 
 // Initialize Firebase
 Firebase.initializeApp(config);

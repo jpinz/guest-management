@@ -4,6 +4,8 @@
     <h2 class="subtitle has-text-centered" v-if="unverifiedCount>0">There are {{unverifiedCount}} unverified accounts.</h2>
 
     <router-link to="social/blacklist" class="button is-danger">Manage Blacklist</router-link>
+    <router-link to="social/deletedparties" class="button is-link">View Deleted Events</router-link>
+
     <br/><br/>
 
     <p>There are currently {{brothers.length}} brothers with accounts.</p>

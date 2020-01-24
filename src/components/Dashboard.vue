@@ -18,7 +18,7 @@
         <tbody>
         <tr v-for="event in events">
           <th>
-            <router-link :to="`/party/${event.id}` ">[{{event.type.toUpperCase()}}] {{event.name}}</router-link>
+            <router-link :to="`/event/${event.id}` ">[{{event.type.toUpperCase()}}] {{event.name}}</router-link>
           </th>
           <td>{{event.total}}</td>
           <td>{{capitalize(event.type)}}</td>
@@ -53,7 +53,7 @@
       <tbody>
       <tr v-for="event in events">
         <th>
-          <router-link :to="`/party/${event.id}`">[{{event.type.toUpperCase()}}] {{event.name}}</router-link>
+          <router-link :to="`/event/${event.id}`">[{{event.type.toUpperCase()}}] {{event.name}}</router-link>
         </th>
         <td>{{event.total}}</td>
         <td>{{capitalize(event.type)}}</td>
