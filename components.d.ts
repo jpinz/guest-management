@@ -4,12 +4,12 @@
 
 declare module 'vue' {
   export interface GlobalComponents {
-    ColorMode: typeof import('./src/components/ColorMode.vue')['default']
+    ColorMode: typeof import("./src/components/ColorMode.vue")["default"];
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     IconFaBrandsGithub: typeof import('~icons/fa-brands/github')['default']
     IconFaSolidMoon: typeof import('~icons/fa-solid/moon')['default']
     IconFaSolidSun: typeof import('~icons/fa-solid/sun')['default']
-    Login: typeof import('./src/components/auth/Login.vue')['default']
+    Login: typeof import("./src/views/auth/Login.vue")["default"];
     Navbar: typeof import('./src/components/navigation/Navbar.vue')['default']
   }
 }
