@@ -1,7 +1,5 @@
 import { ref } from "vue";
-import { supabase } from "@/lib/supabase";
-import { Session, Provider } from "@supabase/gotrue-js/dist/main/lib/types";
-import { ApiError } from "@supabase/supabase-js";
+import { appwrite } from "@/lib/appwrite";
 
 const userSession = ref<Session | null>(null);
 

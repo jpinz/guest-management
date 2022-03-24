@@ -1,84 +1,75 @@
 import { createStore, Store } from "vuex";
-import { User } from "@supabase/gotrue-js/dist/main/lib/types";
-import createPersistedState from "vuex-persistedstate";
-import { supabase } from "@/lib/supabase";
+import VuexPersistence from "vuex-persist";
 import router from "@/router";
-import { ApiError } from "@supabase/supabase-js";
+import { appwrite } from "@/lib/appwrite";
+import { Models } from "appwrite";
 
 export type State = {
-  user: User | null | undefined;
+  account: Models.User<Models.Preferences> | undefined;
+  session: Models.Session | null | undefined;
 };
+
+const vuexLocal = new VuexPersistence<State>({
+  storage: window.localStorage,
+});
 
 export default createStore({
   state: {
-    user: {},
+    account: {},
   } as State,
   mutations: {
-    setUser(state, user: User): void {
-      state.user = user;
-    },
+    setAccount: (state, account) => (state.account = account),
+    setSession: (state, session) => (state.session = session),
   },
   actions: {
     async signInAction({ commit }, { email, password }) {
       try {
-        const { error, user } = await supabase.auth.signIn({
-          email: email,
-          password: password,
-        });
+        const session = await appwrite.account.createSession(email, password);
 
-        if (error) throw error;
-        // No error throw, but no user detected so send magic link
-        if (!error && !user) {
-          alert("Check your email for the login link!");
-        }
+        var account = await appwrite.account.get();
         alert("You've Signed In successfully");
+        commit("setAccount", account);
+        commit("setSession", session);
         await router.push("/");
-        commit("setUser", user as User);
       } catch (e) {
-        const error = e as ApiError;
-        console.error("Error thrown:", error.message);
-        alert(error.message || error);
+        console.error("Error thrown:", e);
       }
     },
-    async signUpAction({ dispatch }, form) {
+    async signUpAction({ dispatch }, { email, password, name }) {
       try {
-        const { error } = await supabase.auth.signUp({
-          email: form.email,
-          password: form.password,
-        });
-        if (error) throw error;
+        const account = await appwrite.account.create(
+          "unique()",
+          email,
+          password,
+          name
+        );
+        dispatch("setAccount", account);
         alert("You've been registered successfully");
-        await dispatch("signInAction", form);
       } catch (e) {
-        const error = e as ApiError;
-        console.error("Error thrown:", error.message);
-        alert(error.message || error);
+        console.error("Error thrown:", e);
       }
     },
     async signOutAction({ commit }) {
       try {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
-        commit("setUser", null);
+        await appwrite.account.deleteSession("current");
+        commit("setAccount", null);
         alert("You've been logged Out successfully");
         await router.push("/");
       } catch (e) {
-        const error = e as ApiError;
-        console.error("Error thrown:", error.message);
-        alert(error.message || error);
+        console.error("Error thrown:", e);
       }
     },
   },
   modules: {},
   getters: {
-    user(state) {
-      return state.user;
+    account(state) {
+      return state.account;
     },
-    email(state) {
-      return state.user?.email;
+    session(state) {
+      return state.session;
     },
   },
-  plugins: [createPersistedState()],
+  plugins: [],
 });
 
 declare module "@vue/runtime-core" {
