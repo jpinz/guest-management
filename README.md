@@ -1,84 +1,121 @@
-# guest-management
+# README
 
-> Guest List management website for social events.
+Welcome to [RedwoodJS](https://redwoodjs.com)!
 
-First get **npm** from https://www.npmjs.com/get-npm
+> **Prerequisites**
+>
+> - Redwood requires [Node.js](https://nodejs.org/en/) (>=14.19.x <=16.x) and [Yarn](https://yarnpkg.com/) (>=1.15)
+> - Are you on Windows? For best results, follow our [Windows development setup](https://redwoodjs.com/docs/how-to/windows-development-setup) guide
 
-## Build Setup
-
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run startLocal
-
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# serve the built application at localhost:5000 (only after build)
-npm run start
-
-# run unit tests
-npm run unit
-
-# run e2e tests
-npm run e2e
-
-# run all tests
-npm test
-```
-
-## Normal config
-Change info in appConfig.json to whatever you want.
-
-## Firebase
-
-You must have the [Firebase CLI](https://firebase.google.com/docs/cli/) installed. If you don't have it install it with `npm install -g firebase-tools` and then configure it with `firebase login`.
-
-First make a [firebase app](https://firebase.google.com/).
-
-Make sure you enable firebase email/password authentication: https://console.firebase.google.com/project/fraternity-parties/authentication/providers
-
-Then get the config information, from https://console.firebase.google.com/project/fraternity-parties/settings/general/ scroll to the bottom and click the icon named "Add Firebase to your web app", then copy from `apiKey` to the end of the `messagingSenderId` line, and paste in a javascript filewith the following structure:
+Start by installing dependencies:
 
 ```
-export const config = {
-  apiKey: '<API_KEY>',
-  authDomain: '<PROJECT_ID>.firebaseapp.com',
-  databaseURL: 'https://<DATABASE_NAME>.firebaseio.com',
-  projectId: '<PROJECT_ID>',
-  storageBucket: '<BUCKET>.appspot.com',
-  messagingSenderId: '<SENDER_ID>'
-};
+yarn install
 ```
 
-into a file called `firebaseConfig.js` in `src/config`
+Then change into that directory and start the development server:
 
-## How to finish the setup and deploy the site:
+```
+cd my-redwood-project
+yarn redwood dev
+```
 
-1. firebase init
-2. Yes project
-3. check Database, functions. hosting, and storage
-4. select your project (if issue, make sure there's no .firebaserc)
-5. yes on database.json
-6. no on overwrite
-7. yes on javascript
-8. no on eslint
-9. no on override functions/package.json
-10. no on override functions/index.js
-11. yes on install dependencies
-12. instead of public chose dist as directory
-13. No on single page
-14. enter on storage.rules
+Your browser should automatically open to http://localhost:8910 where you'll see the Welcome Page, which links out to a ton of great resources.
 
-**then run `npm run build` followed by `firebase deploy`**
+> **The Redwood CLI**
+>
+> Congratulations on running your first Redwood CLI command!
+> From dev to deploy, the CLI is with you the whole way.
+> And there's quite a few commands at your disposal:
+> ```
+> yarn redwood --help
+> ```
+> For all the details, see the [CLI reference](https://redwoodjs.com/docs/cli-commands).
 
-Then your site should be available at http://name-of-project.firebaseapp.com
+## Prisma and the database
 
-## Issues
+Redwood wouldn't be a full-stack framework without a database. It all starts with the schema. Open the [`schema.prisma`](api/db/schema.prisma) file in `api/db` and replace the `UserExample` model with the following `Post` model:
 
-Please report any issues found on the issues page here on github, or to me directly. Thanks!
+```
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  body      String
+  createdAt DateTime @default(now())
+}
+```
+
+Redwood uses [Prisma](https://www.prisma.io/), a next-gen Node.js and TypeScript ORM, to talk to the database. Prisma's schema offers a declarative way of defining your app's data models. And Prisma [Migrate](https://www.prisma.io/migrate) uses that schema to make database migrations hassle-free:
+
+```
+yarn rw prisma migrate dev
+
+# ...
+
+? Enter a name for the new migration: › create posts
+```
+
+> `rw` is short for `redwood`
+
+You'll be prompted for the name of your migration. `create posts` will do.
+
+Now let's generate everything we need to perform all the CRUD (Create, Retrieve, Update, Delete) actions on our `Post` model:
+
+```
+yarn redwood g scaffold post
+```
+
+Navigate to http://localhost:8910/posts/new, fill in the title and body, and click "Save":
+
+Did we just create a post in the database? Yup! With `yarn rw g scaffold <model>`, Redwood created all the pages, components, and services necessary to perform all CRUD actions on our posts table.
+
+## Frontend first with Storybook
+
+Don't know what your data models look like?
+That's more than ok—Redwood integrates Storybook so that you can work on design without worrying about data.
+Mockup, build, and verify your React components, even in complete isolation from the backend:
+
+```
+yarn rw storybook
+```
+
+Before you start, see if the CLI's `setup ui` command has your favorite styling library:
+
+```
+yarn rw setup ui --help
+```
+
+## Testing with Jest
+
+It'd be hard to scale from side project to startup without a few tests.
+Redwood fully integrates Jest with the front and the backends and makes it easy to keep your whole app covered by generating test files with all your components and services:
+
+```
+yarn rw test
+```
+
+To make the integration even more seamless, Redwood augments Jest with database [scenarios](https://redwoodjs.com/docs/testing.md#scenarios)  and [GraphQL mocking](https://redwoodjs.com/docs/testing.md#mocking-graphql-calls).
+
+## Ship it
+
+Redwood is designed for both serverless deploy targets like Netlify and Vercel and serverful deploy targets like Render and AWS:
+
+```
+yarn rw g setup deploy --help
+```
+
+Don't go live without auth!
+Lock down your front and backends with Redwood's built-in, database-backed authentication system ([dbAuth](https://redwoodjs.com/docs/authentication#self-hosted-auth-installation-and-setup)), or integrate with nearly a dozen third party auth providers:
+
+```
+yarn rw g setup auth --help
+```
+
+## Next Steps
+
+The best way to learn Redwood is by going through the comprehensive [tutorial](https://redwoodjs.com/docs/tutorial/foreword) and joining the community (via the [Discourse forum](https://community.redwoodjs.com) or the [Discord server](https://discord.gg/redwoodjs)).
+
+## Quick Links
+
+- Stay updated: read [Forum announcements](https://community.redwoodjs.com/c/announcements/5), follow us on [Twitter](https://twitter.com/redwoodjs), and subscribe to the [newsletter](https://redwoodjs.com/newsletter)
+- [Learn how to contribute](https://redwoodjs.com/docs/contributing)
