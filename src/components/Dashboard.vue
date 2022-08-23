@@ -27,7 +27,13 @@
             <a class="button is-link" :href="`${event.jobsUrl}`" target="_blank">Jobs</a>
           </th>
           <th v-else>
-            <button class="button is-link" v-on:click="addUrl(event.id)">Add Jobs Sheet</button>
+            <button class="button is-link" v-on:click="addJUrl(event.id)">Add Jobs Sheet</button>
+          </th>
+          <th v-if="event.flyerUrl">
+            <a class="button is-link" :href="`${event.flyerUrl}`" target="_blank">Flyer</a>
+          </th>
+          <th v-else>
+            <button class="button is-link" v-on:click="addFUrl(event.id)">Add Flyer</button>
           </th>
           <td>
             <b-switch @input="close(event.id, event.closed)" v-model="event.closed"></b-switch>
@@ -48,6 +54,7 @@
         <th>Type</th>
         <th>Date</th>
         <th>Jobs</th>
+        <th>Flyer</th>
       </tr>
       </thead>
       <tbody>
@@ -62,7 +69,14 @@
           <a class="button is-link" :href="`${event.jobsUrl}`" target="_blank">Jobs</a>
         </th>
         <th v-else-if="riskManager">
-          <button class="button is-link" v-on:click="addUrl(event.id)">Add Jobs Sheet</button>
+          <button class="button is-link" v-on:click="addJUrl(event.id)">Add Jobs Sheet</button>
+        </th>
+        <td v-else>Not up</td>
+        <th v-if="event.flyerUrl">
+          <a class="button is-link" :href="`${event.flyerUrl}`" target="_blank">Flyer</a>
+        </th>
+        <th v-else-if="riskManager">
+          <button class="button is-link" v-on:click="addFUrl(event.id)">Add Flyer</button>
         </th>
         <td v-else>Not up</td>
       </tr>
@@ -172,7 +186,7 @@
           closed: closed
         });
       },
-      addUrl: function (id) {
+      addJUrl: function (id) {
         console.log(id);
         let url = prompt("Please enter the Google sheets URL for the party jobs (with http:// or https:// at the beginning):", "");
         if (!url) {
@@ -182,6 +196,19 @@
         } else {
           firebase.database().ref('events/' + id).update({
             jobsUrl: url
+          });
+        }
+      },
+      addFUrl: function (id) {
+        console.log(id);
+        let url = prompt("Please enter the Google sheets URL for the party jobs (with http:// or https:// at the beginning):", "");
+        if (!url) {
+          //User cancelled prompt
+        } else if(url && !url.startsWith("https://") && !url.startsWith("http://")) {
+          alert("You didn't start the url with http:// or https://");
+        } else {
+          firebase.database().ref('events/' + id).update({
+            flyerUrl: url
           });
         }
       },
