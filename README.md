@@ -1,84 +1,51 @@
-# guest-management
+# Bulletproof React 🛡️ ⚛️
 
-> Guest List management website for social events.
+[![MIT License](https://img.shields.io/github/license/alan2207/bulletproof-react)](https://github.com/alan2207/bulletproof-react/blob/master/LICENCE)
+[![CI](https://github.com/alan2207/bulletproof-react/actions/workflows/ci.yml/badge.svg)](https://github.com/alan2207/bulletproof-react/actions/workflows/ci.yml)
 
-First get **npm** from https://www.npmjs.com/get-npm
+A simple, scalable, and powerful architecture for building production ready React applications.
 
-## Build Setup
+## Introduction
 
-``` bash
-# install dependencies
-npm install
+React is a great tool for building frontend applications. It has a very diverse ecosystem with hundreds of great libraries for literally anything you might need. However, it can be overwhelming to be forced to make so many choices.
+It is also very flexible, you can write React applications in any way you like but that flexibility comes with a cost. Since there is no pre-defined architecture developers can follow, it often leads to messy, inconsistent, or over-complicated codebases.
 
-# serve with hot reload at localhost:8080
-npm run startLocal
+This is an attempt to present a way of creating React applications using the best tools in the ecosystem with a good project structure that scales very well. It is based on the experience of working with many different codebases, and this architecture turns out to be the most effective one.
 
-# build for production with minification
-npm run build
+The goal of this repo is to serve as a collection of resources and good practices when developing React applications. It is supposed to showcase solving most of the real-world problems of an application in a practical way and help developers writing better applications.
 
-# build for production and view the bundle analyzer report
-npm run build --report
+Feel free to explore the codebase to get the most value out of the repo.
 
-# serve the built application at localhost:5000 (only after build)
-npm run start
+#### Disclaimer:
 
-# run unit tests
-npm run unit
+This is not supposed to be a template, boilerplate or a framework. It is an opinionated guide that shows how to do some things in a certain way. You are not forced to do everything exactly as it is shown here, decide what works best for you and your team and stay consistent with your style.
 
-# run e2e tests
-npm run e2e
+## Table Of Contents:
 
-# run all tests
-npm test
-```
+- [💻 Application Overview](docs/application-overview.md)
+- [⚙️ Project Configuration](docs/project-configuration.md)
+- [👁️ Style Guide](docs/style-guide.md)
+- [🗄️ Project Structure](docs/project-structure.md)
+- [🧱 Components And Styling](docs/components-and-styling.md)
+- [📡 API Layer](docs/api-layer.md)
+- [🗃️ State Management](docs/state-management.md)
+- [🧪 Testing](docs/testing.md)
+- [⚠️ Error Handling](docs/error-handling.md)
+- [🔐 Security](docs/security.md)
+- [🚄 Performance](docs/performance.md)
+- [🌐 Deployment](docs/deployment.md)
+- [📚 Additional Resources](docs/additional-resources.md)
 
-## Normal config
-Change info in appConfig.json to whatever you want.
+## Contributing
 
-## Firebase
+Contributions are always welcome! If you have any ideas, suggestions, fixes, feel free to contribute. You can do that by going through the following steps:
 
-You must have the [Firebase CLI](https://firebase.google.com/docs/cli/) installed. If you don't have it install it with `npm install -g firebase-tools` and then configure it with `firebase login`.
+1. Clone this repo
+2. Create a branch: `git checkout -b your-feature`
+3. Make some changes
+4. Test your changes
+5. Push your branch and open a Pull Request
 
-First make a [firebase app](https://firebase.google.com/).
+## License
 
-Make sure you enable firebase email/password authentication: https://console.firebase.google.com/project/fraternity-parties/authentication/providers
-
-Then get the config information, from https://console.firebase.google.com/project/fraternity-parties/settings/general/ scroll to the bottom and click the icon named "Add Firebase to your web app", then copy from `apiKey` to the end of the `messagingSenderId` line, and paste in a javascript filewith the following structure:
-
-```
-export const config = {
-  apiKey: '<API_KEY>',
-  authDomain: '<PROJECT_ID>.firebaseapp.com',
-  databaseURL: 'https://<DATABASE_NAME>.firebaseio.com',
-  projectId: '<PROJECT_ID>',
-  storageBucket: '<BUCKET>.appspot.com',
-  messagingSenderId: '<SENDER_ID>'
-};
-```
-
-into a file called `firebaseConfig.js` in `src/config`
-
-## How to finish the setup and deploy the site:
-
-1. firebase init
-2. Yes project
-3. check Database, functions. hosting, and storage
-4. select your project (if issue, make sure there's no .firebaserc)
-5. yes on database.json
-6. no on overwrite
-7. yes on javascript
-8. no on eslint
-9. no on override functions/package.json
-10. no on override functions/index.js
-11. yes on install dependencies
-12. instead of public chose dist as directory
-13. No on single page
-14. enter on storage.rules
-
-**then run `npm run build` followed by `firebase deploy`**
-
-Then your site should be available at http://name-of-project.firebaseapp.com
-
-## Issues
-
-Please report any issues found on the issues page here on github, or to me directly. Thanks!
+[MIT](https://choosealicense.com/licenses/mit/)
