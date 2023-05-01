@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { EventType } from "@prisma/client";
+import { EventType, Role } from '@prisma/client';
 import type { LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useTransition } from "@remix-run/react";
@@ -10,7 +10,7 @@ import { z } from "zod";
 
 import { requireAuthSession, commitAuthSession } from "~/modules/auth";
 import { createEvent } from "~/modules/event";
-import { assertIsPost, isFormProcessing } from "~/utils";
+import { assertIsPost, isAllowedToEditEvents, isFormProcessing } from "~/utils";
 
 export const NewEventFormSchema = z.object({
   title: z.string().min(2, "require-title"),
@@ -21,6 +21,11 @@ export const NewEventFormSchema = z.object({
 export async function action({ request }: LoaderArgs) {
   assertIsPost(request);
   const authSession = await requireAuthSession(request);
+
+  if(!isAllowedToEditEvents(authSession.user.role)) {
+    return redirect(`/dashboard/${authSession.organizationId}`);
+  }
+
   const formData = await request.formData();
   const result = await NewEventFormSchema.safeParseAsync(parseFormAny(formData));
 
