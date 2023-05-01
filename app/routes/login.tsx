@@ -21,17 +21,22 @@ export async function loader({ request }: LoaderArgs) {
   const t = await i18nextServer.getFixedT(request, "auth");
   const title = t("login.title");
 
-  if (authSession) return redirect("/notes");
+  if (authSession) return redirect("/dashboard");
 
   return json({ title });
 }
 
 const LoginFormSchema = z.object({
   email: z
-    .string()
-    .email("invalid-email")
-    .transform((email) => email.toLowerCase()),
-  password: z.string().min(8, "password-too-short"),
+  .string({
+    required_error: "Email is required",
+    invalid_type_error: "Email must be a string",
+  })
+  .email("invalid-email")
+  .transform((email) => email.toLowerCase()),
+  password: z.string({
+    required_error: "Password is required",
+  }).min(8, "password-too-short"),
   redirectTo: z.string().optional(),
 });
 
@@ -60,10 +65,11 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
+  // TODO: Get the user's organization ID and redirect to the correct org.
   return createAuthSession({
     request,
     authSession,
-    redirectTo: redirectTo || "/notes",
+    redirectTo: redirectTo || "/dashboard",
   });
 }
 

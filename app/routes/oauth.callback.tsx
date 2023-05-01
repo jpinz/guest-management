@@ -12,7 +12,7 @@ import {
   commitAuthSession,
   getAuthSession,
 } from "~/modules/auth";
-import { tryCreateUser, getUserByEmail } from "~/modules/user";
+import { getUserByEmail } from "~/modules/user";
 import { assertIsPost, safeRedirect } from "~/utils";
 
 // imagine a user go back after OAuth login success or type this URL
@@ -20,7 +20,8 @@ import { assertIsPost, safeRedirect } from "~/utils";
 export async function loader({ request }: LoaderArgs) {
   const authSession = await getAuthSession(request);
 
-  if (authSession) return redirect("/notes");
+  // TODO get org id for redirect
+  if (authSession) return redirect("/dashboard/org");
 
   return json({});
 }
@@ -46,7 +47,7 @@ export async function action({ request }: ActionArgs) {
   }
 
   const { redirectTo, refreshToken } = result.data;
-  const safeRedirectTo = safeRedirect(redirectTo, "/notes");
+  const safeRedirectTo = safeRedirect(redirectTo, "/dashboard");
 
   // We should not trust what is sent from the client
   // https://github.com/rphlmr/supa-fly-stack/issues/45
@@ -72,6 +73,7 @@ export async function action({ request }: ActionArgs) {
     });
   }
 
+  /* TODO: Fix this.
   // first time sign in, let's create a brand-new User row in supabase
   const user = await tryCreateUser(authSession);
 
@@ -82,7 +84,7 @@ export async function action({ request }: ActionArgs) {
       },
       { status: 500 }
     );
-  }
+  }*/
 
   return redirect(safeRedirectTo, {
     headers: {
@@ -97,7 +99,7 @@ export default function LoginCallback() {
   const error = useActionData<typeof action>();
   const fetcher = useFetcher();
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") ?? "/notes";
+  const redirectTo = searchParams.get("redirectTo") ?? "/dashboard";
   const supabase = useMemo(() => getSupabase(), []);
 
   useEffect(() => {

@@ -9,7 +9,7 @@ generator client {
 
 model Organization {
   id            String  @id @default(cuid())
-  contact_email String
+  contactEmail String
   name          String
   users         User[]
   Event         Event[]
@@ -24,7 +24,8 @@ model User {
   organization   Organization @relation(fields: [organizationId], references: [id])
   organizationId String
   role           Role
-  personalGuests Guest[]
+  personalGuests PersonalGuest[]
+  eventGuests    EventGuest[]
 }
 
 model Event {
@@ -34,10 +35,19 @@ model Event {
   date           DateTime
   organization   Organization @relation(fields: [organizationId], references: [id])
   organizationId String
-  guests         Guest[]
+  guests         EventGuest[]
 }
 
-model Guest {
+model PersonalGuest {
+  id        String   @id @default(cuid())
+  name      String
+  gender    Gender
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId    String
+}
+
+model EventGuest {
   id        String   @id @default(cuid())
   name      String
   gender    Gender
@@ -60,7 +70,6 @@ enum Role {
 
 enum EventType {
   SOCIAL
-  NOCIAL
   PARTY
   SEMIFORMAL
 }

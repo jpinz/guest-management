@@ -1,25 +1,28 @@
 import * as React from "react";
 
+import { EventType } from "@prisma/client";
 import type { LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useTransition } from "@remix-run/react";
+import dayjs from "dayjs";
 import { parseFormAny, useZorm } from "react-zorm";
 import { z } from "zod";
 
 import { requireAuthSession, commitAuthSession } from "~/modules/auth";
-import { createNote } from "~/modules/note";
+import { createEvent } from "~/modules/event";
 import { assertIsPost, isFormProcessing } from "~/utils";
 
-export const NewNoteFormSchema = z.object({
+export const NewEventFormSchema = z.object({
   title: z.string().min(2, "require-title"),
-  body: z.string().min(1, "require-body"),
+  date: z.string(),
+  eventType: z.nativeEnum(EventType),
 });
 
 export async function action({ request }: LoaderArgs) {
   assertIsPost(request);
   const authSession = await requireAuthSession(request);
   const formData = await request.formData();
-  const result = await NewNoteFormSchema.safeParseAsync(parseFormAny(formData));
+  const result = await NewEventFormSchema.safeParseAsync(parseFormAny(formData));
 
   if (!result.success) {
     return json(
@@ -35,19 +38,21 @@ export async function action({ request }: LoaderArgs) {
     );
   }
 
-  const { title, body } = result.data;
 
-  const note = await createNote({ title, body, userId: authSession.userId });
+  const { title, date, eventType } = result.data;
 
-  return redirect(`/notes/${note.id}`, {
+  const event = await createEvent({ title, date: dayjs(date).toDate(), eventType, organizationId: authSession.organizationId });
+
+  
+  return redirect(`/events/${event.id}`, {
     headers: {
       "Set-Cookie": await commitAuthSession(request, { authSession }),
     },
   });
 }
 
-export default function NewNotePage() {
-  const zo = useZorm("NewQuestionWizardScreen", NewNoteFormSchema);
+export default function NewEventPage() {
+  const zo = useZorm("NewQuestionWizardScreen", NewEventFormSchema);
   const transition = useTransition();
   const disabled = isFormProcessing(transition.state);
 
@@ -80,17 +85,33 @@ export default function NewNotePage() {
 
       <div>
         <label className="flex w-full flex-col gap-1">
-          <span>Body: </span>
-          <textarea
-            name={zo.fields.body()}
-            rows={8}
+          <span>Date: </span>
+          <input
+            type="datetime-local"
+            name={zo.fields.date()}
             className="w-full flex-1 rounded-md border-2 border-blue-500 px-3 py-2 text-lg leading-6"
             disabled={disabled}
           />
         </label>
-        {zo.errors.body()?.message && (
+        {zo.errors.date()?.message && (
           <div className="pt-1 text-red-700" id="body-error">
-            {zo.errors.body()?.message}
+            {zo.errors.date()?.message}
+          </div>
+        )}
+      </div>
+
+      <div>
+        <label className="flex w-full flex-col gap-1">
+          <span>EventType: </span>
+          <select name={zo.fields.eventType()} id="eventType">
+            <option value="SOCIAL">SOCIAL</option>
+            <option value="PARTY">PARTY</option>
+            <option value="SEMIFORMAL">SEMIFORMAL</option>
+          </select>
+        </label>
+        {zo.errors.eventType()?.message && (
+          <div className="pt-1 text-red-700" id="body-error">
+            {zo.errors.eventType()?.message}
           </div>
         )}
       </div>
@@ -98,7 +119,7 @@ export default function NewNotePage() {
       <div className="text-right">
         <button
           type="submit"
-          className="rounded bg-blue-500  px-4 py-2 text-white focus:bg-blue-400 hover:bg-blue-600"
+          className="rounded bg-blue-500 px-4 py-2 text-white focus:bg-blue-400 hover:bg-blue-600"
           disabled={disabled}
         >
           Save

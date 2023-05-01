@@ -15,9 +15,11 @@ export async function getEvent({ id }: Pick<Event, "id">) {
   });
 }
 
-export async function getEvents() {
+export async function getEvents({ organizationId }: {
+  organizationId: User["organizationId"];
+}) {
   return db.event.findMany({
-    where: {},
+    where: { id: organizationId },
     select: {
       id: true,
       eventType: true,
@@ -29,22 +31,15 @@ export async function getEvents() {
   });
 }
 
-export async function createEvent({
-  title,
-  eventType,
-  date,
-  orgId,
-}: Pick<Event, "title" | "eventType" | "date"> & {
-  orgId: User["organizationId"];
-}) {
+export async function createEvent(event: Omit<Event, "id">) {
   return db.event.create({
     data: {
-      title,
-      eventType,
-      date,
+      title: event.title,
+      eventType: event.eventType,
+      date: event.date,
       organization: {
         connect: {
-          id: orgId,
+          id: event.organizationId,
         },
       },
     },

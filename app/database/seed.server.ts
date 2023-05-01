@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
-import { PrismaClient } from "@prisma/client";
+import { faker } from '@faker-js/faker';
+import { PrismaClient, Role } from "@prisma/client";
 import { createClient } from "@supabase/supabase-js";
 
 import { SUPABASE_SERVICE_ROLE, SUPABASE_URL } from "../utils/env";
@@ -52,28 +53,33 @@ async function seed() {
       // no worries if it doesn't exist yet
     });
 
+    const org = await prisma.organization.create({
+      data: {
+        id: faker.datatype.uuid(),
+        contactEmail: email,
+        name: faker.word.noun(),
+      },
+    });
+
     const user = await prisma.user.create({
       data: {
-        email,
-        id,
+        id: id,
+        email: email,
+        name: faker.name.fullName(),
+        gradYear: faker.date.future(4).getFullYear(),
+        rushClass: faker.date.recent().getFullYear(),
+        role: faker.helpers.arrayElement(Object.values(Role)),
+        organizationId: org.id,
       },
     });
 
-    await prisma.note.create({
-      data: {
-        title: "My first note",
-        body: "Hello, world!",
-        userId: user.id,
-      },
-    });
-
-    await prisma.note.create({
-      data: {
-        title: "My second note",
-        body: "Hello, world!",
-        userId: user.id,
-      },
-    });
+    // await prisma.note.create({
+    //   data: {
+    //     title: "My first note",
+    //     body: "Hello, world!",
+    //     userId: user.id,
+    //   },
+    // });
 
     console.log(`Database has been seeded. 🌱\n`);
     console.log(

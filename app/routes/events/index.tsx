@@ -9,13 +9,14 @@ export async function loader({ request }: LoaderArgs) {
   return null;
 }
 
-export default function NoteIndexPage() {
+// TODO: Block create a new event for those without permission.
+export default function EventIndexPage() {
   return (
     <>
       <p>
-        No note selected. Select a note on the left, or{" "}
+        No event selected. Select an event on the left, or{" "}
         <Link to="new" className="text-blue-500 underline">
-          create a new note.
+          create a new event.
         </Link>
       </p>
     </>

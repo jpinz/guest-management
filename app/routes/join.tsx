@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { Role } from "@prisma/client";
 import type { ActionArgs, LoaderArgs, MetaFunction } from "@remix-run/node";
 import { redirect, json } from "@remix-run/node";
 import { Form, Link, useSearchParams, useTransition } from "@remix-run/react";
@@ -21,17 +22,38 @@ export async function loader({ request }: LoaderArgs) {
   const t = await i18nextServer.getFixedT(request, "auth");
   const title = t("register.title");
 
-  if (authSession) return redirect("/notes");
+  if (authSession) return redirect("/dashboard");
 
   return json({ title });
 }
 
 const JoinFormSchema = z.object({
   email: z
-    .string()
+    .string({
+      required_error: "Email is required",
+      invalid_type_error: "Email must be a string",
+    })
     .email("invalid-email")
     .transform((email) => email.toLowerCase()),
-  password: z.string().min(8, "password-too-short"),
+  password: z.string({
+    required_error: "Password is required",
+  }).min(8, "password-too-short"),
+  name: z.string({
+    required_error: "Name is required",
+    invalid_type_error: "Name must be a string",
+  }),
+  gradYear: z.number({
+    required_error: "Grad year is required",
+    invalid_type_error: "Grad year must be a number",
+  }).gte(2020, "Must be more recent than 2020!"),
+  rushClass: z.number({
+    required_error: "Rush class is required",
+    invalid_type_error: "Rush class must be a number",
+  }).gte(2016, "Must be more recent than 2016!"),
+  organizationId: z.string({
+    required_error: "Organization ID is required",
+    invalid_type_error: "Organization ID must be a string",
+  }).uuid("Organization ID must be a valid UUID"),
   redirectTo: z.string().optional(),
 });
 
@@ -49,7 +71,7 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
-  const { email, password, redirectTo } = result.data;
+  const { email, password, name, gradYear, rushClass, organizationId, redirectTo } = result.data;
 
   const existingUser = await getUserByEmail(email);
 
@@ -60,7 +82,7 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
-  const authSession = await createUserAccount(email, password);
+  const authSession = await createUserAccount(email, password, name, gradYear, rushClass, organizationId, Role.USER);
 
   if (!authSession) {
     return json(
@@ -72,7 +94,7 @@ export async function action({ request }: ActionArgs) {
   return createAuthSession({
     request,
     authSession,
-    redirectTo: redirectTo || "/notes",
+    redirectTo: redirectTo || `/dashboard/${organizationId}`,
   });
 }
 

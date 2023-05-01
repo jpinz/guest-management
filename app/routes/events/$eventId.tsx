@@ -1,21 +1,21 @@
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { redirect, json } from "@remix-run/node";
-import { Form, useCatch, useLoaderData } from "@remix-run/react";
+import { useCatch, useLoaderData } from "@remix-run/react";
 
 import { requireAuthSession, commitAuthSession } from "~/modules/auth";
-import { deleteNote, getNote } from "~/modules/note";
+import { deleteEvent, getEvent } from "~/modules/event";
 import { assertIsDelete, getRequiredParam } from "~/utils";
 
 export async function loader({ request, params }: LoaderArgs) {
   const { userId } = await requireAuthSession(request);
 
-  const id = getRequiredParam(params, "noteId");
+  const id = getRequiredParam(params, "eventId");
 
-  const note = await getNote({ userId, id });
-  if (!note) {
+  const event = await getEvent({ id });
+  if (!event) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ note });
+  return json({ event });
 }
 
 export async function action({ request, params }: ActionArgs) {
@@ -23,9 +23,9 @@ export async function action({ request, params }: ActionArgs) {
   const id = getRequiredParam(params, "noteId");
   const authSession = await requireAuthSession(request);
 
-  await deleteNote({ userId: authSession.userId, id });
+  await deleteEvent({ id });
 
-  return redirect("/notes", {
+  return redirect("/events", {
     headers: {
       "Set-Cookie": await commitAuthSession(request, { authSession }),
     },
@@ -37,17 +37,10 @@ export default function NoteDetailsPage() {
 
   return (
     <div>
-      <h3 className="text-2xl font-bold">{data.note.title}</h3>
-      <p className="py-6">{data.note.body}</p>
+      <h3 className="text-2xl font-bold">{data.event.title}</h3>
+      <p className="py-6">{data.event.date}</p>
       <hr className="my-4" />
-      <Form method="delete">
-        <button
-          type="submit"
-          className="rounded bg-blue-500  px-4 py-2 text-white focus:bg-blue-400 hover:bg-blue-600"
-        >
-          Delete
-        </button>
-      </Form>
+      <p className="py-6">{data.event.eventType}</p>
     </div>
   );
 }

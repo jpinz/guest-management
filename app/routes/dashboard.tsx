@@ -3,29 +3,29 @@ import { json } from "@remix-run/node";
 import { useLoaderData, Outlet, Link, NavLink } from "@remix-run/react";
 
 import { LogoutButton, requireAuthSession } from "~/modules/auth";
-import { getNotes } from "~/modules/note";
+import { getEvents } from "~/modules/event";
 import { notFound } from "~/utils/http.server";
 
 export async function loader({ request }: LoaderArgs) {
-  const { userId, email } = await requireAuthSession(request);
+  const { email, organizationId } = await requireAuthSession(request);
 
-  const notes = await getNotes({ userId });
+  const events = await getEvents({ organizationId });
 
-  if (!notes) {
-    throw notFound(`No user with id ${userId}`);
+  if (!events) {
+    throw notFound(`No events with the organization id ${organizationId}`);
   }
 
-  return json({ email, notes });
+  return json({ email, events });
 }
 
-export default function NotesPage() {
+export default function DashboardPage() {
   const data = useLoaderData<typeof loader>();
 
   return (
     <div className="flex h-full min-h-screen flex-col">
       <header className="flex items-center justify-between bg-slate-800 p-4 text-white">
         <h1 className="text-3xl font-bold">
-          <Link to=".">Notes</Link>
+          <Link to=".">Events</Link>
         </h1>
         <p>{data.email}</p>
         <LogoutButton />
@@ -33,25 +33,27 @@ export default function NotesPage() {
 
       <main className="flex h-full bg-white">
         <div className="h-full w-80 border-r bg-gray-50">
-          <Link to="new" className="block p-4 text-xl text-blue-500">
-            + New Note
+          {/* TODO: if the user is social or above */}
+          <Link to="/events/new" className="block p-4 text-xl text-blue-500">
+            + New Event
           </Link>
 
           <hr />
 
-          {data.notes.length === 0 ? (
-            <p className="p-4">No notes yet</p>
+          {data.events.length === 0 ? (
+            <p className="p-4">No events yet</p>
           ) : (
             <ol>
-              {data.notes.map((note) => (
-                <li key={note.id}>
+              {data.events.map((event) => (
+                <li key={event.id}>
                   <NavLink
                     className={({ isActive }) =>
                       `block border-b p-4 text-xl ${isActive ? "bg-white" : ""}`
                     }
-                    to={note.id}
+                    to={event.id}
                   >
-                    📝 {note.title}
+                    📝 {event.title}
+                    {event.eventType}
                   </NavLink>
                 </li>
               ))}
