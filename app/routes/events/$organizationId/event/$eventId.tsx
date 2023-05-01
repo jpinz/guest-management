@@ -20,19 +20,19 @@ export async function loader({ request, params }: LoaderArgs) {
 
 export async function action({ request, params }: ActionArgs) {
   assertIsDelete(request);
-  const id = getRequiredParam(params, "noteId");
+  const id = getRequiredParam(params, "eventId");
   const authSession = await requireAuthSession(request);
 
   await deleteEvent({ id });
 
-  return redirect("/events", {
+  return redirect(`/dashboard/${authSession.organizationId}`, {
     headers: {
       "Set-Cookie": await commitAuthSession(request, { authSession }),
     },
   });
 }
 
-export default function NoteDetailsPage() {
+export default function EventDetailsPage() {
   const data = useLoaderData<typeof loader>();
 
   return (
@@ -53,7 +53,7 @@ export function CatchBoundary() {
   const caught = useCatch();
 
   if (caught.status === 404) {
-    return <div>Note not found</div>;
+    return <div>Event not found</div>;
   }
 
   throw new Error(`Unexpected caught response with status: ${caught.status}`);
