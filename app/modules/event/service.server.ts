@@ -4,6 +4,11 @@ import { db } from "~/database";
 export async function getEvent(id: string) {
   return db.event.findUnique({
     where: { id },
+    include: {
+      _count: {
+        select: { guests: true },
+      },
+    },
   });
 }
 
@@ -11,6 +16,11 @@ export async function getEvents(organizationId: string) {
   return db.event.findMany({
     where: { organizationId: organizationId },
     orderBy: { date: "desc" },
+    include: {
+      _count: {
+        select: { guests: true },
+      },
+    },
   });
 }
 
