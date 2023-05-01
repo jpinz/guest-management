@@ -42,9 +42,8 @@ export async function action({ request }: LoaderArgs) {
   const { title, date, eventType } = result.data;
 
   const event = await createEvent({ title, date: dayjs(date).toDate(), eventType, organizationId: authSession.organizationId });
-
   
-  return redirect(`/events/${event.id}`, {
+  return redirect(`/events/${authSession.organizationId}/event/${event.id}`, {
     headers: {
       "Set-Cookie": await commitAuthSession(request, { authSession }),
     },
