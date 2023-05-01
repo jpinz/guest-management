@@ -8,7 +8,7 @@ generator client {
 }
 
 model Organization {
-  id            String  @id @default(cuid())
+  id            String  @id @default(uuid())
   contactEmail String
   name          String
   users         User[]
@@ -16,7 +16,7 @@ model Organization {
 }
 
 model User {
-  id             String       @id @default(cuid())
+  id             String       @id @default(uuid())
   email          String       @unique
   name           String
   gradYear       Int
@@ -29,7 +29,7 @@ model User {
 }
 
 model Event {
-  id             String       @id @default(cuid())
+  id             String       @id @default(uuid())
   title          String
   eventType      EventType
   date           DateTime
@@ -39,7 +39,7 @@ model Event {
 }
 
 model PersonalGuest {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   name      String
   gender    Gender
   createdAt DateTime @default(now())
@@ -48,7 +48,7 @@ model PersonalGuest {
 }
 
 model EventGuest {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   name      String
   gender    Gender
   createdAt DateTime @default(now())
