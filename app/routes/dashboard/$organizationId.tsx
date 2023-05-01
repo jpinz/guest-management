@@ -4,18 +4,14 @@ import { useLoaderData, Outlet, Link, NavLink } from "@remix-run/react";
 
 import { LogoutButton, requireAuthSession } from "~/modules/auth";
 import { getEvents } from "~/modules/event";
-import { getRequiredParam, notFound } from "~/utils/http.server";
+import { getRequiredParam } from "~/utils/http.server";
 
 export async function loader({ request, params }: LoaderArgs) {
   const organizationId = getRequiredParam(params, "organizationId");
 
   await requireAuthSession(request);
 
-  const events = await getEvents({ organizationId });
-
-  if (!events) {
-    throw notFound(`No events with the organization id ${organizationId}`);
-  }
+  const events = await getEvents(organizationId);
 
   return json({ organizationId, events });
 }

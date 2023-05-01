@@ -11,7 +11,7 @@ export async function loader({ request, params }: LoaderArgs) {
 
   const id = getRequiredParam(params, "eventId");
 
-  const event = await getEvent({ id });
+  const event = await getEvent(id);
   if (!event) {
     throw new Response("Not Found", { status: 404 });
   }
@@ -23,7 +23,7 @@ export async function action({ request, params }: ActionArgs) {
   const id = getRequiredParam(params, "eventId");
   const authSession = await requireAuthSession(request);
 
-  await deleteEvent({ id });
+  await deleteEvent(id);
 
   return redirect(`/dashboard/${authSession.organizationId}`, {
     headers: {

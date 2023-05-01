@@ -1,17 +1,15 @@
-import type { Event, User } from "~/database";
+import type { Event } from "~/database";
 import { db } from "~/database";
 
-export async function getEvent({ id }: Pick<Event, "id">) {
+export async function getEvent(id: string) {
   return db.event.findUnique({
     where: { id },
   });
 }
 
-export async function getEvents({ organizationId }: {
-  organizationId: User["organizationId"];
-}) {
+export async function getEvents(organizationId: string) {
   return db.event.findMany({
-    where: { id: organizationId },
+    where: { organizationId: organizationId },
     orderBy: { date: "desc" },
   });
 }
@@ -31,7 +29,7 @@ export async function createEvent(event: Omit<Event, "id">) {
   });
 }
 
-export async function deleteEvent({ id }: Pick<Event, "id">) {
+export async function deleteEvent(id: string) {
   return db.event.deleteMany({
     where: { id },
   });
