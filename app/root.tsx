@@ -5,6 +5,7 @@ import type {
 } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
+  Link,
   Links,
   LiveReload,
   Meta,
@@ -18,6 +19,7 @@ import { useChangeLanguage } from "remix-i18next";
 
 import { i18nextServer } from "~/integrations/i18n";
 
+import { LogoutButton, getAuthSession } from "./modules/auth";
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 import { getBrowserEnv } from "./utils/env";
 
@@ -32,15 +34,18 @@ export const meta: MetaFunction = () => ({
 });
 
 export const loader: LoaderFunction = async ({ request }) => {
+  const authSession = await getAuthSession(request);
+
   const locale = await i18nextServer.getLocale(request);
   return json({
     locale,
     env: getBrowserEnv(),
+    user: authSession?.user,
   });
 };
 
 export default function App() {
-  const { env, locale } = useLoaderData<typeof loader>();
+  const { env, locale, user } = useLoaderData<typeof loader>();
   const { i18n } = useTranslation();
 
   useChangeLanguage(locale);
@@ -52,6 +57,16 @@ export default function App() {
         <Links />
       </head>
       <body className="h-full">
+        <header className="flex items-center justify-between bg-slate-800 p-4 text-white">
+          <h1 className="text-3xl font-bold">
+            {user !== undefined ? (
+              <Link to={`/dashboard/${user.organizationId}`}>Social</Link>
+            ) : (
+              <Link to=".">Social</Link>
+            )}
+          </h1>
+          {user !== undefined ? <LogoutButton /> : null}
+        </header>
         <Outlet />
         <ScrollRestoration />
         <script
