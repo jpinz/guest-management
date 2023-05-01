@@ -12,8 +12,11 @@ export async function getOrganization({ id }: Pick<Organization, "id">) {
   });
 }
 
-export async function getOrganizations() {
+export async function getOrganizations(organizationId?: string) {
   return db.organization.findMany({
+    where: {
+      ...(organizationId ? {id: organizationId } : {}),
+    },
     select: {
       id: true,
       name: true,

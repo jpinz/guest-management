@@ -26,6 +26,7 @@ export async function mapAuthSession(
     userId: supabaseAuthSession.user.id,
     organizationId: user.organizationId,
     email: supabaseAuthSession.user.email,
+    user: user,
     expiresIn: supabaseAuthSession.expires_in ?? -1,
     expiresAt: supabaseAuthSession.expires_at ?? -1,
   };

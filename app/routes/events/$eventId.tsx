@@ -7,7 +7,7 @@ import { deleteEvent, getEvent } from "~/modules/event";
 import { assertIsDelete, getRequiredParam } from "~/utils";
 
 export async function loader({ request, params }: LoaderArgs) {
-  const { userId } = await requireAuthSession(request);
+  await requireAuthSession(request);
 
   const id = getRequiredParam(params, "eventId");
 
