@@ -2,15 +2,7 @@ import type { Event, User } from "~/database";
 import { db } from "~/database";
 
 export async function getEvent({ id }: Pick<Event, "id">) {
-  return db.event.findFirst({
-    select: {
-      id: true,
-      eventType: true,
-      title: true,
-      date: true,
-      organization: true,
-      guests: true,
-    },
+  return db.event.findUnique({
     where: { id },
   });
 }
@@ -20,13 +12,6 @@ export async function getEvents({ organizationId }: {
 }) {
   return db.event.findMany({
     where: { id: organizationId },
-    select: {
-      id: true,
-      eventType: true,
-      title: true,
-      date: true,
-      organization: true,
-    },
     orderBy: { date: "desc" },
   });
 }

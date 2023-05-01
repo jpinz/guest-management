@@ -1,26 +1,14 @@
 import type { Organization } from "~/database";
 import { db } from "~/database";
 
-export async function getOrganization({ id }: Pick<Organization, "id">) {
-  return db.organization.findFirst({
-    select: {
-      id: true,
-      name: true,
-      contactEmail: true,
-    },
-    where: { id },
-  });
+export async function getOrganization(organizationId: string) {
+  return db.organization.findUnique({ where: { id: organizationId }});
 }
 
 export async function getOrganizations(organizationId?: string) {
   return db.organization.findMany({
     where: {
       ...(organizationId ? {id: organizationId } : {}),
-    },
-    select: {
-      id: true,
-      name: true,
-      contactEmail: true,
     },
     orderBy: { name: "desc" },
   });
