@@ -1,9 +1,11 @@
 import { Role } from "@prisma/client";
+import type { Event } from "@prisma/client";
 import type { LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useLoaderData, Link, NavLink } from "@remix-run/react";
+import { useLoaderData, Link } from "@remix-run/react";
 
-import { LogoutButton, requireAuthSession } from "~/modules/auth";
+import { EventCardComponent } from "~/components/event";
+import { requireAuthSession } from "~/modules/auth";
 import { getEvents } from "~/modules/event";
 import { isAllowedToEditEvents } from "~/utils";
 import { getRequiredParam } from "~/utils/http.server";
@@ -50,18 +52,10 @@ export default function DashboardPage() {
         ) : (
           <ol>
             {events.map((event) => (
-              <li key={event.id}>
-                <NavLink
-                  className={({ isActive }) =>
-                    `block border-b p-4 text-xl ${isActive ? "bg-white" : ""}`
-                  }
-                  to={`/events/${organizationId}/event/${event.id}`}
-                >
-                  📝 {event.title}
-                  {event.eventType}
-                </NavLink>
-              </li>
-            ))}
+                <li key={event.id}>
+                  <EventCardComponent event={event as unknown as Event} guestCount={event._count.guests} />
+                </li>
+              ))}
           </ol>
         )}
       </main>
