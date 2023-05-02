@@ -56,7 +56,7 @@ model EventGuest {
   checkedIn DateTime?
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId    String
-  Event     Event   @relation(fields: [eventId], references: [id])
+  event     Event   @relation(fields: [eventId], references: [id])
   eventId   String
 }
 
