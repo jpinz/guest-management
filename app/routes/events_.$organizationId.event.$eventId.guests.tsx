@@ -9,8 +9,8 @@ import { z } from "zod";
 import { AddGuestComponent, GuestListComponent, NewEventGuestFormSchema } from "~/components/event";
 import { commitAuthSession, requireAuthSession } from "~/modules/auth";
 import { getEvent } from "~/modules/event";
-import { addEventGuest } from "~/modules/guest/event";
-import { assertIsPost, getRequiredParam } from "~/utils";
+import { addEventGuest, checkInEventGuest } from "~/modules/guest/event";
+import { assertIsPostOrPatch, getRequiredParam } from "~/utils";
 
 export async function loader({ request, params }: LoaderArgs) {
   await requireAuthSession(request);
@@ -25,11 +25,19 @@ export async function loader({ request, params }: LoaderArgs) {
 }
 
 export async function action({ request, params }: ActionArgs) {
-  assertIsPost(request);
+  assertIsPostOrPatch(request);
   const eventId = getRequiredParam(params, "eventId");
   const authSession = await requireAuthSession(request);
 
   const formData = await request.formData();
+
+  let guestId = formData.get("guestId");
+
+  if(guestId != null) { 
+    await checkInEventGuest(guestId.toString());
+    return null;
+  }
+
   const result = await NewEventGuestFormSchema.safeParseAsync(parseFormAny(formData));
 
   if (!result.success) {
@@ -64,11 +72,10 @@ export default function GuestsManagement() {
       <div key={gender} className="flex max-w-xl flex-col items-start justify-between">
         <div className="group relative">
           <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-          <span className="absolute inset-0" />
               {gender}
           </h3>
           <AddGuestComponent event={event as unknown as Event} gender={gender} />
-          <GuestListComponent guests={guests.filter((g) => g.gender == gender)} />
+          <GuestListComponent guests={guests.filter((g) => g.gender == gender)} frontDoorMode={true} />
           
         </div>
       </div>

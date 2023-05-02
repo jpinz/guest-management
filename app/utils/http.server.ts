@@ -19,6 +19,10 @@ export function isPost(request: Request) {
   return request.method.toLowerCase() === "post";
 }
 
+export function isPatch(request: Request) {
+  return request.method.toLowerCase() === "patch";
+}
+
 export function isDelete(request: Request) {
   return request.method.toLowerCase() === "delete";
 }
@@ -50,6 +54,18 @@ export function getRequiredParam(
 
 export function assertIsPost(request: Request, message = "Method not allowed") {
   if (!isPost(request)) {
+    throw notAllowedMethod(message);
+  }
+}
+
+export function assertIsPatch(request: Request, message = "Method not allowed") {
+  if (!isPatch(request)) {
+    throw notAllowedMethod(message);
+  }
+}
+
+export function assertIsPostOrPatch(request: Request, message = "Method not allowed") {
+  if (!isPost(request) && !isPatch(request)) {
     throw notAllowedMethod(message);
   }
 }

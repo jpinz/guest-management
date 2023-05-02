@@ -52,7 +52,8 @@ export function AddGuestComponent(props: { event: Event; gender: string }) {
             name={zo.fields.gender()}
             value={props.gender}
             type="text"
-            className="hidden"
+            hidden={true}
+            readOnly={true}
           />
 
           <button
