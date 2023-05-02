@@ -1,6 +1,6 @@
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { redirect, json } from "@remix-run/node";
-import { useCatch, useLoaderData } from "@remix-run/react";
+import { Outlet, useCatch, useLoaderData } from "@remix-run/react";
 
 import { requireAuthSession, commitAuthSession } from "~/modules/auth";
 import { deleteEvent, getEvent } from "~/modules/event";
@@ -33,14 +33,15 @@ export async function action({ request, params }: ActionArgs) {
 }
 
 export default function EventDetailsPage() {
-  const data = useLoaderData<typeof loader>();
+  const { event } = useLoaderData<typeof loader>();
 
   return (
     <div>
-      <h3 className="text-2xl font-bold">{data.event.title}</h3>
-      <p className="py-6">{data.event.date}</p>
+      <h3 className="text-2xl font-bold">{event.title}</h3>
+      <p className="py-6">{event.date}</p>
       <hr className="my-4" />
-      <p className="py-6">{data.event.eventType}</p>
+      <p className="py-6">{event.eventType}</p>
+      <Outlet />
     </div>
   );
 }

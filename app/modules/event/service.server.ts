@@ -8,6 +8,7 @@ export async function getEvent(id: string) {
       _count: {
         select: { guests: true },
       },
+      guests: true
     },
   });
 }
