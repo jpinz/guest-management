@@ -26,6 +26,7 @@
   },
   "prettier": {},
   "dependencies": {
+    "@headlessui/react": "^1.7.14",
     "@heroicons/react": "^2.0.17",
     "@prisma/client": "^4.10.1",
     "@remix-run/node": "^1.15.0",

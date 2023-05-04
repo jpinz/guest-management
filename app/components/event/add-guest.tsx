@@ -2,7 +2,7 @@ import { MagnifyingGlassIcon, UsersIcon } from "@heroicons/react/20/solid";
 import { Gender } from "@prisma/client";
 import type { Event } from "@prisma/client";
 import { Form } from "@remix-run/react";
-import { parseFormAny, useZorm } from "react-zorm";
+import { useZorm } from "react-zorm";
 import { z } from "zod";
 
 export const NewEventGuestFormSchema = z.object({
@@ -24,12 +24,6 @@ export function AddGuestComponent(props: { event: Event; gender: string }) {
       }}
     >
       <div>
-        <label
-          htmlFor={`add-${props.gender}`}
-          className="block text-sm font-medium leading-6 text-gray-900"
-        >
-          {props.gender}
-        </label>
         <div className="mt-2 flex rounded-md shadow-sm">
           <div className="relative flex grow items-stretch focus-within:z-10">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">

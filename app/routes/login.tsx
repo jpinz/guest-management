@@ -69,7 +69,7 @@ export async function action({ request }: ActionArgs) {
   return createAuthSession({
     request,
     authSession,
-    redirectTo: redirectTo || `/dashboard/${authSession.organizationId}`,
+    redirectTo: redirectTo || `/dashboard/${authSession.organization.id}`,
   });
 }
 

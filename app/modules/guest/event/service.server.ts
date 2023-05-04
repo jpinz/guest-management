@@ -1,10 +1,13 @@
-import type { EventGuest } from "~/database";
+import type { EventGuest, PrismaEventGuest } from "~/database";
 import { db } from "~/database";
 
-export async function getEventGuests(eventId: string) {
+export async function getEventGuests(eventId: string): Promise<EventGuest[]> {
   return db.eventGuest.findMany({
     where: { eventId: eventId },
     orderBy: { name: "desc" },
+    include: { 
+      user: true,
+    },
   });
 }
 
@@ -26,7 +29,9 @@ export async function checkOutEventGuest(id: string) {
   });
 }
 
-export async function addEventGuest(guest: Omit<EventGuest, "id" | "createdAt" | "updatedAt" | "checkedIn">) {
+export async function addEventGuest(
+  guest: Omit<PrismaEventGuest, "id" | "createdAt" | "updatedAt" | "checkedIn">
+) {
   return db.eventGuest.create({
     data: {
       name: guest.name,

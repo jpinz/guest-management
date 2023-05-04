@@ -23,7 +23,7 @@ export async function action({ request }: LoaderArgs) {
   const authSession = await requireAuthSession(request);
 
   if(!isAllowedToEditEvents(authSession.user.role)) {
-    return redirect(`/dashboard/${authSession.organizationId}`);
+    return redirect(`/dashboard/${authSession.organization.id}`);
   }
 
   const formData = await request.formData();
@@ -46,9 +46,9 @@ export async function action({ request }: LoaderArgs) {
 
   const { title, date, eventType } = result.data;
 
-  const event = await createEvent({ title, date: dayjs(date).toDate(), eventType, organizationId: authSession.organizationId });
+  const event = await createEvent({ title, date: dayjs(date).toDate(), eventType, organizationId: authSession.organization.id });
   
-  return redirect(`/events/${authSession.organizationId}/event/${event.id}`, {
+  return redirect(`/events/${authSession.organization.id}/event/${event.id}`, {
     headers: {
       "Set-Cookie": await commitAuthSession(request, { authSession }),
     },

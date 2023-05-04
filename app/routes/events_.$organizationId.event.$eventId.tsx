@@ -25,7 +25,7 @@ export async function action({ request, params }: ActionArgs) {
 
   await deleteEvent(id);
 
-  return redirect(`/dashboard/${authSession.organizationId}`, {
+  return redirect(`/dashboard/${authSession.organization.id}`, {
     headers: {
       "Set-Cookie": await commitAuthSession(request, { authSession }),
     },

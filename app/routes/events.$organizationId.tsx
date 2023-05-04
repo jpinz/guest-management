@@ -6,5 +6,5 @@ import { requireAuthSession } from "~/modules/auth";
 export async function loader({ request }: LoaderArgs) {
   var authSession = await requireAuthSession(request);
 
-  return redirect(`/dashboard/${authSession.organizationId}`)
+  return redirect(`/dashboard/${authSession.organization.id}`)
 }

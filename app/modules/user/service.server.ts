@@ -1,6 +1,6 @@
 import type { Role } from "@prisma/client";
 
-import type { User } from "~/database";
+import type { PrismaUser, User } from "~/database";
 import { db } from "~/database";
 import type { AuthSession } from "~/modules/auth";
 import {
@@ -9,11 +9,16 @@ import {
   deleteAuthAccount,
 } from "~/modules/auth";
 
-export async function getUserByEmail(email: User["email"]) {
-  return db.user.findUnique({ where: { email: email.toLowerCase() } });
+export async function getUserByEmail(
+  email: User["email"]
+): Promise<User | null> {
+  return db.user.findUnique({
+    where: { email: email.toLowerCase() },
+    include: { organization: true },
+  });
 }
 
-async function createUser(user: User): Promise<User | null> {
+async function createUser(user: PrismaUser): Promise<User | null> {
   return db.user
     .create({
       data: {
@@ -29,12 +34,15 @@ async function createUser(user: User): Promise<User | null> {
           },
         },
       },
+      include: {
+        organization: true,
+      },
     })
     .then((user) => user)
     .catch(() => null);
 }
 
-export async function tryCreateUser(user: User) {
+export async function tryCreateUser(user: PrismaUser): Promise<User | null> {
   const createdUser = await createUser(user);
 
   // user account created and have a session but unable to store in User table
@@ -44,7 +52,7 @@ export async function tryCreateUser(user: User) {
     return null;
   }
 
-  return user;
+  return createdUser;
 }
 
 export async function createUserAccount(
@@ -54,7 +62,7 @@ export async function createUserAccount(
   gradYear: number,
   rushClass: number,
   organizationId: string,
-  role: Role,
+  role: Role
 ): Promise<AuthSession | null> {
   const authAccount = await createEmailAuthAccount(email, password);
 
@@ -77,7 +85,8 @@ export async function createUserAccount(
     rushClass: rushClass,
     organizationId: organizationId,
     role: role,
-    id: authAccount.id,});
+    id: authAccount.id,
+  });
 
   if (!user) return null;
 

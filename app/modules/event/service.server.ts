@@ -1,14 +1,15 @@
 import type { Event } from "~/database";
 import { db } from "~/database";
 
-export async function getEvent(id: string) {
+export async function getEvent(id: string): Promise<Event | null> {
   return db.event.findUnique({
     where: { id },
     include: {
-      _count: {
-        select: { guests: true },
-      },
-      guests: true
+      guests: {
+        include: {
+          user: true,
+        }
+      }
     },
   });
 }
@@ -25,7 +26,7 @@ export async function getEvents(organizationId: string) {
   });
 }
 
-export async function createEvent(event: Omit<Event, "id">) {
+export async function createEvent(event: Omit<Event, "id" | "guests">): Promise<Event> {
   return db.event.create({
     data: {
       title: event.title,
@@ -36,6 +37,13 @@ export async function createEvent(event: Omit<Event, "id">) {
           id: event.organizationId,
         },
       },
+    },
+    include: {
+      guests: {
+        include: {
+          user: true,
+        }
+      }
     },
   });
 }

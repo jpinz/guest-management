@@ -1,7 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 
 import { NODE_ENV } from "../utils/env";
-export type { Organization, Event, User, EventGuest, PersonalGuest } from "@prisma/client";
+export type {
+  Organization,
+  Event as PrismaEvent,
+  User as PrismaUser,
+  EventGuest as PrismaEventGuest,
+  PersonalGuest as PrismaPersonalGuest,
+} from "@prisma/client";
 
 let db: PrismaClient;
 

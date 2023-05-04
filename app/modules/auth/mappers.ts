@@ -4,7 +4,7 @@ import type { SupabaseAuthSession } from "~/integrations/supabase";
 import type { AuthSession } from "./types";
 
 export async function mapAuthSession(
-  supabaseAuthSession: SupabaseAuthSession | null,
+  supabaseAuthSession: SupabaseAuthSession | null
 ): Promise<AuthSession | null> {
   if (!supabaseAuthSession) return null;
 
@@ -14,7 +14,10 @@ export async function mapAuthSession(
   if (!supabaseAuthSession.user?.email)
     throw new Error("User should have an email");
 
-  let user = await db.user.findUnique({ where: { id: supabaseAuthSession.user.id } });
+  let user = await db.user.findUnique({
+    where: { id: supabaseAuthSession.user.id },
+    include: { organization: true },
+  });
 
   if (!user) {
     throw new Error("User should have a user account");
@@ -24,7 +27,7 @@ export async function mapAuthSession(
     accessToken: supabaseAuthSession.access_token,
     refreshToken: supabaseAuthSession.refresh_token,
     userId: supabaseAuthSession.user.id,
-    organizationId: user.organizationId,
+    organization: user.organization,
     email: supabaseAuthSession.user.email,
     user: user,
     expiresIn: supabaseAuthSession.expires_in ?? -1,

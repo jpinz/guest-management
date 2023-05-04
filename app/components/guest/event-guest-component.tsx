@@ -1,33 +1,59 @@
-import type { EventGuest } from "@prisma/client";
 import { Form } from "@remix-run/react";
+import dayjs from "dayjs";
+
+import type { EventGuest } from "~/database";
 
 export function EventGuestComponent(props: {
   guest: EventGuest;
+  manageGuest: boolean;
   frontDoorMode: boolean;
 }) {
-  const guest = props.guest;
 
   return (
-    <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow">
-      <div className="px-4 py-5 sm:px-6">
-        <span>{guest.name}</span>
-      </div>
-      <div className="px-4 py-5 sm:p-6">
-        {guest.checkedIn != null ? (
-          <span>{guest.checkedIn.toString()}</span>
+    <tr key={props.guest.id}>
+      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+        {props.guest.name}
+      </td>
+      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+        {props.guest.user.name}
+      </td>
+      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+        {" "}
+        {props.guest.checkedIn != null ? (
+          <button
+            type="button"
+            className="rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 hover:bg-indigo-500"
+          >
+            {dayjs(props.guest.checkedIn).format("HH:mm:ss")}
+          </button>
         ) : (
           <Form method="patch">
             <button
               type="submit"
-              className="rounded bg-indigo-600 px-2 py-1 text-xs font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 hover:bg-indigo-500"
+              className="rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:pointer-events-none disabled:bg-indigo-300 hover:bg-indigo-500"
               name="guestId"
-              value={guest.id}
+              value={props.guest.id}
+              disabled={!props.frontDoorMode}
             >
               Check-In
             </button>
           </Form>
         )}
-      </div>
-    </div>
+      </td>
+      {props.manageGuest && !props.frontDoorMode && (
+        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+          <Form method="delete">
+            <button
+              type="submit"
+              className="rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 hover:bg-red-500"
+              name="guestId"
+              value={props.guest.id}
+            >
+              Delete
+            </button>
+          </Form>
+        </td>
+      )}
+    </tr>
   );
 }
