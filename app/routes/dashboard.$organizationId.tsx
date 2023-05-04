@@ -1,10 +1,10 @@
 import { Role } from "@prisma/client";
-import type { Event } from "@prisma/client";
 import type { LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
 
-import { EventCardComponent } from "~/components/event";
+import { EventListComponent } from "~/components/dashboard";
+import type { EventWithPrismaGuests } from "~/database";
 import { requireAuthSession } from "~/modules/auth";
 import { getEvents } from "~/modules/event";
 import { isAllowedToEditEvents } from "~/utils";
@@ -50,13 +50,7 @@ export default function DashboardPage() {
         {events.length === 0 ? (
           <p className="p-4">No events yet</p>
         ) : (
-          <ol>
-            {events.map((event) => (
-                <li key={event.id}>
-                  <EventCardComponent event={event as unknown as Event} guestCount={event._count.guests} />
-                </li>
-              ))}
-          </ol>
+          <EventListComponent events={events as unknown as EventWithPrismaGuests[]} manageEvents={allowedToEditEvents} />
         )}
       </main>
     </div>

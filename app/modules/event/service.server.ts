@@ -1,4 +1,4 @@
-import type { Event } from "~/database";
+import type { Event, EventWithPrismaGuests } from "~/database";
 import { db } from "~/database";
 
 export async function getEvent(id: string): Promise<Event | null> {
@@ -8,25 +8,25 @@ export async function getEvent(id: string): Promise<Event | null> {
       guests: {
         include: {
           user: true,
-        }
-      }
-    },
-  });
-}
-
-export async function getEvents(organizationId: string) {
-  return db.event.findMany({
-    where: { organizationId: organizationId },
-    orderBy: { date: "desc" },
-    include: {
-      _count: {
-        select: { guests: true },
+        },
       },
     },
   });
 }
 
-export async function createEvent(event: Omit<Event, "id" | "guests">): Promise<Event> {
+export async function getEvents(organizationId: string): Promise<EventWithPrismaGuests[]> {
+  return db.event.findMany({
+    where: { organizationId: organizationId },
+    orderBy: { date: "desc" },
+    include: {
+      guests: true,
+    },
+  });
+}
+
+export async function createEvent(
+  event: Omit<Event, "id" | "guests">
+): Promise<Event> {
   return db.event.create({
     data: {
       title: event.title,
@@ -42,8 +42,8 @@ export async function createEvent(event: Omit<Event, "id" | "guests">): Promise<
       guests: {
         include: {
           user: true,
-        }
-      }
+        },
+      },
     },
   });
 }

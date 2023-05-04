@@ -14,6 +14,10 @@ export type Event = PrismaEvent & {
   guests: EventGuest[];
 };
 
+export type EventWithPrismaGuests = PrismaEvent & {
+  guests: PrismaEventGuest[];
+};
+
 export type EventGuest = PrismaEventGuest & {
   user: PrismaUser;
 };

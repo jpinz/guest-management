@@ -1,6 +1,4 @@
-import * as React from "react";
-
-import { EventType, Role } from '@prisma/client';
+import { EventType } from '@prisma/client';
 import type { LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useTransition } from "@remix-run/react";
