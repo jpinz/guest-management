@@ -18,6 +18,15 @@ export async function getUserByEmail(
   });
 }
 
+export async function getUsesrByOrganization(
+  organizationId: User["organizationId"]
+): Promise<User[]> {
+  return db.user.findMany({
+    where: { organizationId: organizationId },
+    include: { organization: true },
+  });
+}
+
 async function createUser(user: PrismaUser): Promise<User | null> {
   return db.user
     .create({

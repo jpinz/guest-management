@@ -5,6 +5,7 @@ import { Gender } from "@prisma/client";
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useCatch, useLoaderData } from "@remix-run/react";
+import clsx from "clsx";
 import { parseFormAny } from "react-zorm";
 
 import {
@@ -22,9 +23,6 @@ import {
   isAllowedToCheckInGuest,
 } from "~/utils";
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export async function loader({ request, params }: LoaderArgs) {
   const authSession = await requireAuthSession(request);
@@ -108,14 +106,14 @@ export default function GuestsManagement() {
           <Switch
             checked={frontDoorMode}
             onChange={setFrontDoorMode}
-            className={classNames(
+            className={clsx(
               frontDoorMode ? "bg-indigo-600" : "bg-gray-200",
               "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
             )}
           >
             <span
               aria-hidden="true"
-              className={classNames(
+              className={clsx(
                 frontDoorMode ? "translate-x-5" : "translate-x-0",
                 "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
               )}
