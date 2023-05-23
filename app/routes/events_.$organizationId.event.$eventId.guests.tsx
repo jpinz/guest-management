@@ -77,7 +77,7 @@ export async function action({ request, params }: ActionArgs) {
     eventId: eventId,
   });
 
-  return null;
+  return new Response("CREATED");
 }
 
 export default function GuestsManagement() {

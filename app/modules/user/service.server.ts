@@ -9,10 +9,43 @@ import {
   deleteAuthAccount,
 } from "~/modules/auth";
 
+export type UpdateUser = {
+  id?: User["id"];
+  email?: User["email"];
+  name?: User["name"];
+  gradYear?: User["gradYear"];
+  rushClass?: User["rushClass"];
+  role?: User["role"];
+  hasSocialPermission?: User["hasSocialPermission"];
+}
+
+export async function updateUser({
+  id,
+  email,
+  name,
+  gradYear,
+  rushClass,
+  role ,
+  hasSocialPermission,
+}: UpdateUser): Promise<User> {
+  return await db.user.update({
+    where: { id: id },
+    include: { organization: true },
+    data: {
+      email: email,
+      name: name,
+      gradYear: gradYear,
+      rushClass: rushClass,
+      role: role,
+      hasSocialPermission: hasSocialPermission,
+    },
+  });
+}
+
 export async function getUserByEmail(
   email: User["email"]
 ): Promise<User | null> {
-  return db.user.findUnique({
+  return await db.user.findUnique({
     where: { email: email.toLowerCase() },
     include: { organization: true },
   });
@@ -21,14 +54,14 @@ export async function getUserByEmail(
 export async function getUsesrByOrganization(
   organizationId: User["organizationId"]
 ): Promise<User[]> {
-  return db.user.findMany({
+  return await db.user.findMany({
     where: { organizationId: organizationId },
     include: { organization: true },
   });
 }
 
 async function createUser(user: PrismaUser): Promise<User | null> {
-  return db.user
+  return await db.user
     .create({
       data: {
         id: user.id,
@@ -71,7 +104,8 @@ export async function createUserAccount(
   gradYear: number,
   rushClass: number,
   organizationId: string,
-  role: Role
+  role: Role,
+  hasSocialPermission?: boolean
 ): Promise<AuthSession | null> {
   const authAccount = await createEmailAuthAccount(email, password);
 
@@ -94,6 +128,7 @@ export async function createUserAccount(
     rushClass: rushClass,
     organizationId: organizationId,
     role: role,
+    hasSocialPermission: hasSocialPermission ?? false,
     id: authAccount.id,
   });
 

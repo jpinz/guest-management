@@ -22,6 +22,7 @@ import { i18nextServer } from "~/integrations/i18n";
 import { LogoutButton, getAuthSession } from "./modules/auth";
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 import { getBrowserEnv } from "./utils/env";
+import { isAllowedToEditSocialPermissions } from "./utils";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: tailwindStylesheetUrl },
@@ -65,6 +66,12 @@ export default function App() {
               <Link to=".">Social</Link>
             )}
           </h1>
+
+          {user !== undefined && isAllowedToEditSocialPermissions(user.role) && (
+            <Link to={`/organization/${user.organizationId}/social`}>
+              Organization
+            </Link>
+          )}
           {user !== undefined ? <LogoutButton /> : null}
         </header>
         <Outlet />

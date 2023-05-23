@@ -82,7 +82,7 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
-  const authSession = await createUserAccount(email, password, name, gradYear, rushClass, organizationId, Role.UNVERIFIED);
+  const authSession = await createUserAccount(email, password, name, gradYear, rushClass, organizationId, Role.UNVERIFIED, false);
 
   if (!authSession) {
     return json(
