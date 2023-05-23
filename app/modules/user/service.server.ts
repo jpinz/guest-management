@@ -25,7 +25,7 @@ export async function updateUser({
   name,
   gradYear,
   rushClass,
-  role ,
+  role,
   hasSocialPermission,
 }: UpdateUser): Promise<User> {
   return await db.user.update({

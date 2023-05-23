@@ -1,6 +1,37 @@
 import type { Event, EventWithPrismaGuests } from "~/database";
 import { db } from "~/database";
 
+export type UpdateEvent = {
+  id: Event["id"];
+  title?: Event["title"];
+  eventType?: Event["eventType"];
+  date?: Event["date"];
+};
+
+export async function updateEvent({
+  id,
+  title,
+  eventType,
+  date,
+}: UpdateEvent): Promise<Event> {
+  return await db.event.update({
+    where: { id: id },
+    include: {
+      organization: true,
+      guests: {
+        include: {
+          user: true,
+        },
+      },
+    },
+    data: {
+      title: title,
+      eventType: eventType,
+      date: date,
+    },
+  });
+}
+
 export async function getEvent(id: string): Promise<Event | null> {
   return db.event.findUnique({
     where: { id },
@@ -14,7 +45,9 @@ export async function getEvent(id: string): Promise<Event | null> {
   });
 }
 
-export async function getEvents(organizationId: string): Promise<EventWithPrismaGuests[]> {
+export async function getEvents(
+  organizationId: string
+): Promise<EventWithPrismaGuests[]> {
   return db.event.findMany({
     where: { organizationId: organizationId },
     orderBy: { date: "desc" },
@@ -49,7 +82,7 @@ export async function createEvent(
 }
 
 export async function deleteEvent(id: string) {
-  return db.event.deleteMany({
+  return db.event.delete({
     where: { id },
   });
 }

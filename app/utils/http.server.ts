@@ -70,6 +70,12 @@ export function assertIsPostOrPatch(request: Request, message = "Method not allo
   }
 }
 
+export function assertIsPatchOrDelete(request: Request, message = "Method not allowed") {
+  if (!isPatch(request) && !isDelete(request)) {
+    throw notAllowedMethod(message);
+  }
+}
+
 export function assertIsDelete(
   request: Request,
   message = "Method not allowed"
