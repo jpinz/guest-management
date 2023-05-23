@@ -16,13 +16,16 @@ import {
 import type { Event, EventGuest } from "~/database";
 import { commitAuthSession, requireAuthSession } from "~/modules/auth";
 import { getEvent } from "~/modules/event";
-import { addEventGuest, checkInEventGuest } from "~/modules/guest/event";
+import {
+  addEventGuest,
+  checkInEventGuest,
+  checkOutEventGuest,
+} from "~/modules/guest/event";
 import {
   assertIsPostOrPatch,
   getRequiredParam,
   isAllowedToCheckInGuest,
 } from "~/utils";
-
 
 export async function loader({ request, params }: LoaderArgs) {
   const authSession = await requireAuthSession(request);
@@ -46,7 +49,12 @@ export async function action({ request, params }: ActionArgs) {
   let guestId = formData.get("guestId");
 
   if (guestId != null) {
-    await checkInEventGuest(guestId.toString());
+    let checkOut = formData.get("checkOut") === "true";
+    if (checkOut) {
+      await checkOutEventGuest(guestId.toString());
+    } else {
+      await checkInEventGuest(guestId.toString());
+    }
     return null;
   }
 

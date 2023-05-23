@@ -8,7 +8,6 @@ export function EventGuestComponent(props: {
   manageGuest: boolean;
   frontDoorMode: boolean;
 }) {
-
   return (
     <tr key={props.guest.id}>
       <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
@@ -20,12 +19,30 @@ export function EventGuestComponent(props: {
       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
         {" "}
         {props.guest.checkedIn != null ? (
-          <button
-            type="button"
-            className="rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 hover:bg-indigo-500"
-          >
-            {dayjs(props.guest.checkedIn).format("HH:mm:ss")}
-          </button>
+          <>
+            {props.manageGuest && !props.frontDoorMode ? (
+              <Form method="patch">
+                <input
+                  name="checkOut"
+                  value="true"
+                  hidden={true}
+                  readOnly={true}
+                />
+                <button
+                  type="submit"
+                  className="rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 hover:bg-indigo-500"
+                  name="guestId"
+                  value={props.guest.id}
+                >
+                  {dayjs(props.guest.checkedIn).format("HH:mm:ss")}
+                </button>
+              </Form>
+            ) : (
+              <div className="rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                {dayjs(props.guest.checkedIn).format("HH:mm:ss")}
+              </div>
+            )}
+          </>
         ) : (
           <Form method="patch">
             <button
