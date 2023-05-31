@@ -1,7 +1,7 @@
 import { Role } from "@prisma/client";
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, useFetcher, useLoaderData, useSubmit } from "@remix-run/react";
+import { Form, useLoaderData, useSubmit } from "@remix-run/react";
 import clsx from "clsx";
 
 import type { User } from "~/database";

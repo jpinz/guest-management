@@ -1,10 +1,15 @@
+import { CalendarIcon, GiftIcon, PencilIcon } from "@heroicons/react/20/solid";
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { redirect, json } from "@remix-run/node";
-import { Outlet, useCatch, useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useCatch, useLoaderData } from "@remix-run/react";
+import dayjs from "dayjs";
 
 import { requireAuthSession, commitAuthSession } from "~/modules/auth";
 import { deleteEvent, getEvent } from "~/modules/event";
 import { assertIsDelete, getRequiredParam } from "~/utils";
+
+var advancedFormat = require("dayjs/plugin/advancedFormat");
+dayjs.extend(advancedFormat);
 
 export async function loader({ request, params }: LoaderArgs) {
   await requireAuthSession(request);
@@ -36,11 +41,51 @@ export default function EventDetailsPage() {
   const { event } = useLoaderData<typeof loader>();
 
   return (
-    <div>
-      <h3 className="text-2xl font-bold">{event.title}</h3>
-      <p className="py-6">{event.date}</p>
-      <hr className="my-4" />
-      <p className="py-6">{event.eventType}</p>
+    <div className="mx-auto my-4 max-w-7xl sm:px-6 lg:px-8">
+      <div className="lg:flex lg:items-center lg:justify-between">
+        <div className="min-w-0 flex-1">
+          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+            {event.title}
+          </h2>
+          <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+            <div className="mt-2 flex items-center text-sm text-gray-500">
+              <GiftIcon
+                className="mr-1.5 h-5 w-5 shrink-0 text-gray-400"
+                aria-hidden="true"
+              />
+              {event.eventType}
+            </div>
+            <div className="mt-2 flex items-center text-sm text-gray-500">
+              <CalendarIcon
+                className="mr-1.5 h-5 w-5 shrink-0 text-gray-400"
+                aria-hidden="true"
+              />
+              {dayjs(event.date).format("ddd, MMM Do YYYY - hh:mm A")}
+            </div>
+          </div>
+        </div>
+        <div className="mt-5 flex lg:ml-4 lg:mt-0">
+          <span className="sm:ml-3">
+            <Link
+              to={`/events/${event.organizationId}/event/${event.id}/edit`}
+              >
+            <button
+              type="button"
+              className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            >
+              <PencilIcon
+                className="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400"
+                aria-hidden="true"
+              />
+              Edit
+            </button>
+            </Link>
+          </span>
+        </div>
+      </div>
+      <div className="absolute inset-0 flex items-center" aria-hidden="true">
+        <div className="w-full border-t border-gray-300" />
+      </div>
       <Outlet />
     </div>
   );

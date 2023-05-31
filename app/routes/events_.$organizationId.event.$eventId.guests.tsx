@@ -20,11 +20,14 @@ import {
   addEventGuest,
   checkInEventGuest,
   checkOutEventGuest,
+  deleteEventGuest,
 } from "~/modules/guest/event";
 import {
   assertIsPostOrPatch,
+  assertIsPostOrPatchOrDelete,
   getRequiredParam,
   isAllowedToCheckInGuest,
+  isDelete,
 } from "~/utils";
 
 export async function loader({ request, params }: LoaderArgs) {
@@ -40,7 +43,7 @@ export async function loader({ request, params }: LoaderArgs) {
 }
 
 export async function action({ request, params }: ActionArgs) {
-  assertIsPostOrPatch(request);
+  assertIsPostOrPatchOrDelete(request);
   const eventId = getRequiredParam(params, "eventId");
   const authSession = await requireAuthSession(request);
 
@@ -49,6 +52,10 @@ export async function action({ request, params }: ActionArgs) {
   let guestId = formData.get("guestId");
 
   if (guestId != null) {
+    if (isDelete(request)) {
+      await deleteEventGuest(guestId.toString());
+      return null;
+    }
     let checkOut = formData.get("checkOut") === "true";
     if (checkOut) {
       await checkOutEventGuest(guestId.toString());
