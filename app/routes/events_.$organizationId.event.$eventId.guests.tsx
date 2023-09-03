@@ -23,7 +23,6 @@ import {
   deleteEventGuest,
 } from "~/modules/guest/event";
 import {
-  assertIsPostOrPatch,
   assertIsPostOrPatchOrDelete,
   getRequiredParam,
   isAllowedToCheckInGuest,

@@ -1,11 +1,13 @@
+import { useState } from "react";
+
 import { Switch } from "@headlessui/react";
-import { Link } from "@remix-run/react";
+import { Link, useSubmit } from "@remix-run/react";
 import clsx from "clsx";
 import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
 
 import type { EventWithPrismaGuests } from "~/database";
 
-var advancedFormat = require("dayjs/plugin/advancedFormat");
 dayjs.extend(advancedFormat);
 
 export function EventListItemComponent(props: {
@@ -14,6 +16,15 @@ export function EventListItemComponent(props: {
   manageEvents: boolean;
 }) {
   const event = props.event;
+  const [isOpen, setIsOpen] = useState(event.isOpen);
+  const submit = useSubmit();
+  
+  function handleChange(e: boolean) {
+    const formData = new FormData();
+    formData.append("isOpen", e);
+    submit(formData, { method: "patch", action: `/events/${event.organizationId}/event/${event.id}` });
+    setIsOpen(e);
+  }
 
   return (
     <tr key={props.event.id}>
@@ -34,17 +45,19 @@ export function EventListItemComponent(props: {
       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
         {props.manageEvents && (
           <Switch
-            checked={false} // TODO: Use actual close event status
+            checked={isOpen}
+            onChange={() => handleChange(!isOpen)}
+            name="isOpen"
             className={clsx(
-              false ? "bg-indigo-600" : "bg-gray-200",
+              isOpen ? "bg-indigo-600" : "bg-gray-200",
               "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
             )}
           >
-            <span className="sr-only">Close Event</span>
+            <span className="sr-only">Close/Open Event</span>
             <span
               aria-hidden="true"
               className={clsx(
-                false ? "translate-x-5" : "translate-x-0",
+                isOpen ? "translate-x-5" : "translate-x-0",
                 "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
               )}
             />

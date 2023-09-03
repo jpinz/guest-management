@@ -32,6 +32,23 @@ export async function updateEvent({
   });
 }
 
+export async function setEventOpen(id: string, isOpen: boolean): Promise<Event> {
+  return await db.event.update({
+    where: { id: id },
+    include: {
+      organization: true,
+      guests: {
+        include: {
+          user: true,
+        },
+      },
+    },
+    data: {
+      isOpen: isOpen,
+    },
+  });
+}
+
 export async function getEvent(id: string): Promise<Event | null> {
   return db.event.findUnique({
     where: { id },
@@ -58,7 +75,7 @@ export async function getEvents(
 }
 
 export async function createEvent(
-  event: Omit<Event, "id" | "guests">
+  event: Omit<Event, "id" | "guests" | "isOpen">
 ): Promise<Event> {
   return db.event.create({
     data: {

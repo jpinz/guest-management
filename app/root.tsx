@@ -21,8 +21,8 @@ import { i18nextServer } from "~/integrations/i18n";
 
 import { LogoutButton, getAuthSession } from "./modules/auth";
 import tailwindStylesheetUrl from "./styles/tailwind.css";
-import { getBrowserEnv } from "./utils/env";
 import { isAllowedToEditSocialPermissions } from "./utils";
+import { getBrowserEnv } from "./utils/env";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: tailwindStylesheetUrl },

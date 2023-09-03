@@ -5,8 +5,15 @@ import { Link, Outlet, useCatch, useLoaderData } from "@remix-run/react";
 import dayjs from "dayjs";
 
 import { requireAuthSession, commitAuthSession } from "~/modules/auth";
-import { deleteEvent, getEvent } from "~/modules/event";
-import { assertIsDelete, getRequiredParam } from "~/utils";
+import { deleteEvent, getEvent, setEventOpen } from "~/modules/event";
+import {
+  assertIsDelete,
+  assertIsPatchOrDelete,
+  getRequiredParam,
+  isAllowedToEditEvents,
+  isDelete,
+  isPatch,
+} from "~/utils";
 
 var advancedFormat = require("dayjs/plugin/advancedFormat");
 dayjs.extend(advancedFormat);
@@ -24,18 +31,41 @@ export async function loader({ request, params }: LoaderArgs) {
 }
 
 export async function action({ request, params }: ActionArgs) {
-  assertIsDelete(request);
-  const id = getRequiredParam(params, "eventId");
+  console.log("Action");
+  assertIsPatchOrDelete(request);
+  const eventId = getRequiredParam(params, "eventId");
   const authSession = await requireAuthSession(request);
 
-  await deleteEvent(id);
+  if (!isAllowedToEditEvents(authSession.user.role)) {
+    return redirect(`/dashboard/${authSession.organization.id}`);
+  }
 
-  return redirect(`/dashboard/${authSession.organization.id}`, {
-    headers: {
-      "Set-Cookie": await commitAuthSession(request, { authSession }),
-    },
-  });
+  if (isDelete(request)) {
+    await deleteEvent(eventId);
+
+    return redirect(`/dashboard/${authSession.organization.id}`, {
+      headers: {
+        "Set-Cookie": await commitAuthSession(request, { authSession }),
+      },
+    });
+  }
+
+  if (isPatch(request)) {
+
+    const formData = await request.formData();
+
+    const isOpen = formData.get("isOpen")?.toString().toLowerCase() === 'true' ? true : false;
+
+    await setEventOpen(eventId, isOpen);
+  
+    return redirect(`/dashboard/${authSession.organization.id}`, {
+      headers: {
+        "Set-Cookie": await commitAuthSession(request, { authSession }),
+      },
+    });
+  }
 }
+
 
 export default function EventDetailsPage() {
   const { event } = useLoaderData<typeof loader>();
@@ -66,25 +96,20 @@ export default function EventDetailsPage() {
         </div>
         <div className="mt-5 flex lg:ml-4 lg:mt-0">
           <span className="sm:ml-3">
-            <Link
-              to={`/events/${event.organizationId}/event/${event.id}/edit`}
+            <Link to={`/events/${event.organizationId}/event/${event.id}/edit`}>
+              <button
+                type="button"
+                className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
               >
-            <button
-              type="button"
-              className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-            >
-              <PencilIcon
-                className="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400"
-                aria-hidden="true"
-              />
-              Edit
-            </button>
+                <PencilIcon
+                  className="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+                Edit
+              </button>
             </Link>
           </span>
         </div>
-      </div>
-      <div className="absolute inset-0 flex items-center" aria-hidden="true">
-        <div className="w-full border-t border-gray-300" />
       </div>
       <Outlet />
     </div>
