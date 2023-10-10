@@ -47,11 +47,6 @@ export async function action({ request }: ActionArgs) {
   }
   let role = formData.get("user[role]") != null ? formData.get("user[role]")!.toString() as Role : undefined;
 
-
-  console.log(id);
-  console.log(hasSocialPermission);
-  console.log(role);
-
   await updateUser({id: id, role: role, hasSocialPermission: hasSocialPermission});
 
   return new Response("OK");
@@ -66,7 +61,6 @@ export default function SocialPage() {
     console.log(event.target.form);
     submit(event.target.form);
   }
-
   
   return (
     <div>
@@ -86,29 +80,48 @@ export default function SocialPage() {
                     scope="col"
                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Title
+                    Rush Class
                   </th>
                   <th
                     scope="col"
                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Status
+                    Graduating Year
                   </th>
                   <th
                     scope="col"
                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Role
+                    Role(s)
                   </th>
+                  {isAllowedToEditSocialPermissions(authedUser.role) && (
+                      <th
+                      scope="col"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      Has Social Permissions
+                        </th>
+                        )}
+                  {isAllowedToEditOrganization(authedUser.role) && (
+                      <>
+                        <th
+                      scope="col"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      Is Verified
+                        </th>
+                        <th
+                      scope="col"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      Set Roles
+                        </th>
+                      </>
+                    )}
                   <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-0">
                     <span className="sr-only">Edit</span>
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
-                {(users as unknown as User[]).map((user) => {
-                  console.log(user);
-                  return (<tr key={user.id}>
+                {(users as unknown as User[]).map((user) => (<tr key={user.id}>
                     <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
                       <div className="flex items-center">
                         <div className="font-medium text-gray-900">
@@ -199,7 +212,6 @@ export default function SocialPage() {
                       </>
                     )}
                   </tr>)
-                }
               
                 )}
               </tbody>
